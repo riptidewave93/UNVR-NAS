@@ -54,7 +54,7 @@ Note that currently the install process requires UART to modify the u-boot env f
     sync; reboot
     ```
 
-8. At this point you can remove the HDD/SSD you used, and enjoy Debian 12 with OpenMediaVault on your UNVR Pro!
+8. At this point you can remove the HDD/SSD you used, and enjoy Debian 12 with OpenMediaVault on your UNVR Pro! Default login for OpenMediaVault is `admin:openmediavault`. SSH login information is `debian:debian`.
 
 ## Removal
 
@@ -87,8 +87,6 @@ To restore back to the factory UNVR-Pro firmware, you can do the following steps
 * OpenMediaVault
     * BTRFS does not work, period
         * No kernel module in UBNT kernel, need new kernel source and we can make so many things better...
-* Networking
-    * SFP+ port works, but cloud-init doesn't configure it, so it needs manual setup
 * Fans
     * No service monitoring temps to adjust fan speed, so fans just stay at low spin from u-boot. Fans are on an i2c adt7475 controller
 * Reset Button
