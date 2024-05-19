@@ -1,0 +1,4 @@
+# Unifi firmware
+unifi-firmware/*.bin
+BuildEnv
+output

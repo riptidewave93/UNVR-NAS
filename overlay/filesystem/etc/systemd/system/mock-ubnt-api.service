@@ -1,0 +1,13 @@
+[Unit]
+Description=Mock Unifi API to make ulcmd happy
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/mock-ubnt-api
+KillMode=process
+Restart=on-failure
+RestartSec=2s
+TimeoutStopSec=2s
+
+[Install]
+WantedBy=multi-user.target

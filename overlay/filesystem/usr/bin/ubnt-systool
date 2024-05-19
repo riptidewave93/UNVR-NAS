@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ "$1" == "poweroff" ]; then
+    poweroff
+elif [ "$1" == "reboot" ]; then
+    reboot
+else
+    echo "Unknown ubnt-systool cmd: $@" >> /tmp/ubnt-systool-unknown.log
+fi

@@ -1,0 +1,62 @@
+#!/bin/bash
+set -e
+
+echo "Starting 001-bootstrap within chroot!"
+
+export DEBIAN_FRONTEND=noninteractive
+export APT_LISTCHANGES_FRONTEND=none
+
+# Conf debconf
+debconf-set-selections /debconf.set
+rm -f /debconf.set
+
+# Initial package install
+apt-get clean
+apt-get update
+apt-mark hold linux-image-* # We do not want these, as we run our own kernel!
+
+# Setup ulcmd
+systemctl enable ulcmd
+systemctl enable mock-ubnt-api
+
+# Now that we have our wanted kernel in place, do the rest of our installs
+apt-get -o Dpkg::Options::="--force-confold" -y --allow-downgrades \
+    --allow-remove-essential --allow-change-held-packages install cloud-init \
+    bsdextrautils git binutils ca-certificates e2fsprogs haveged parted curl \
+    locales console-common openssh-server less vim net-tools wireguard-tools \
+    ntpsec u-boot-tools wget u-boot-menu initramfs-tools python3-flask gnupg
+
+# Locale gen
+locale-gen
+
+# Setup OMV repo
+wget --quiet --output-document=- https://packages.openmediavault.org/public/archive.key | gpg --dearmor --yes --output "/usr/share/keyrings/openmediavault-archive-keyring.gpg"
+cat <<EOF >> /etc/apt/sources.list.d/openmediavault.list
+deb [signed-by=/usr/share/keyrings/openmediavault-archive-keyring.gpg] https://packages.openmediavault.org/public sandworm main
+# deb [signed-by=/usr/share/keyrings/openmediavault-archive-keyring.gpg] https://downloads.sourceforge.net/project/openmediavault/packages sandworm main
+## This software is not part of OpenMediaVault, but is offered by third-party
+## developers as a service to OpenMediaVault users.
+deb [signed-by=/usr/share/keyrings/openmediavault-archive-keyring.gpg] https://packages.openmediavault.org/public sandworm partner
+# deb [signed-by=/usr/share/keyrings/openmediavault-archive-keyring.gpg] https://downloads.sourceforge.net/project/openmediavault/packages sandworm partner
+EOF
+
+# Install OMV
+apt-get update
+apt-get --yes --auto-remove --show-upgraded \
+    --allow-downgrades --allow-change-held-packages \
+    --no-install-recommends \
+    --option DPkg::Options::="--force-confdef" \
+    --option DPkg::Options::="--force-confold" \
+    install openmediavault openmediavault-md || true # We "fail" all apt cmds from here on til we boot on HW
+
+# Disable systemd-networkd
+systemctl disable systemd-networkd
+systemctl disable systemd-networkd-wait-online
+systemctl mask systemd-networkd
+systemctl mask systemd-networkd-wait-online
+
+# Cleanup stuff we don't want floating around
+apt-get autoclean || true
+apt-get --purge -y autoremove || true
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /etc/resolv.conf
+rm -rf /var/lib/dbus/machine-id /etc/machine-id # Nuke machine IDs
