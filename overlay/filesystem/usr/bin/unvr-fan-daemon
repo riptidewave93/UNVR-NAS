@@ -1,0 +1,146 @@
+#!/usr/bin/python3
+from functools import lru_cache
+import os
+import re
+import time
+
+UBNTHAL_PATH = "/proc/ubnthal/system.info"
+
+SMARTCTL_PATH = "/usr/sbin/smartctl"
+
+THERMAL_SYS_PATHS = {
+    "UNVRPRO": {
+        "thermal": [
+            "/sys/devices/virtual/thermal/thermal_zone0/temp",
+            "/sys/class/hwmon/hwmon0/device/temp1_input",
+            "/sys/class/hwmon/hwmon0/device/temp2_input",
+            "/sys/class/hwmon/hwmon0/device/temp3_input",
+        ],
+        "fan_pwms": [
+            "/sys/class/hwmon/hwmon0/device/pwm1",
+            "/sys/class/hwmon/hwmon0/device/pwm2",
+            "/sys/class/hwmon/hwmon0/device/pwm3",
+        ],
+    },
+}
+
+
+@lru_cache(None)
+def __get_ubnt_device():
+    try:
+        with open(UBNTHAL_PATH, "r") as f:
+            ubnthal_model = [i for i in f.readlines() if i.startswith("shortname=")][0]
+        return ubnthal_model.lstrip("shortname=").rstrip("\n")
+    except FileNotFoundError:
+        print(
+            f"Error: unable to open {UBNTHAL_PATH}; is the ubnthal kernel module loaded?!"
+        )
+        raise
+
+
+def __get_board_temps():
+    # Are we supported?
+    if __get_ubnt_device() not in THERMAL_SYS_PATHS:
+        raise Exception(
+            f"Error: Your Unifi device of {__get_ubnt_device()} is not yet supported by unvr-fan-daemon! Exiting..."
+        )
+    # For each of our paths, get the temps, and append to single return list
+    board_temps = []
+    for path in THERMAL_SYS_PATHS[__get_ubnt_device()]["thermal"]:
+        try:
+            with open(path, "r") as f:
+                board_temps.append(int(f.readline().rstrip("\n")))
+        except FileNotFoundError:
+            print(f"Warning: Unable to open {path}; ignoring and continuing...")
+            continue
+
+    # Did we get ANY temps?!?
+    if len(board_temps) == 0:
+        raise Exception(
+            "Error: Unable to parse out any board temps for your device, something is really wrong! Exiting..."
+        )
+
+    return board_temps
+
+
+def __get_disk_temps():
+    # Find the list of all devices, which could be none
+    devices = re.findall(
+        r"^[/a-z]+",
+        os.popen(f"{SMARTCTL_PATH} -n standby --scan").read(),
+        re.MULTILINE,
+    )
+
+    # For each disk, get the temp, and append to our list
+    disk_temps = []
+    for dev in devices:
+        dev_temp = re.search(
+            r"^194 [\w-]+\s+0x\d+\s+\d+\s+\d+\s+\d+\s+[\w-]+\s+\w+\s+\S+\s+(\d+)(?:\s[\(][^)]*[\)])?$",
+            os.popen(f"{SMARTCTL_PATH} -A {dev}").read(),
+            re.MULTILINE,
+        )
+        if dev_temp:
+            disk_temps.append(int(f"{dev_temp.group(1)}000"))  # Append zeros
+
+    return disk_temps
+
+
+def __calculate_fan_speed(temp):
+    # our basic fancurve logic
+    match temp:
+        case _ if temp < 40:
+            fanspeed = 25
+        case _ if temp >= 40 and temp < 50:
+            fanspeed = 75
+        case _ if temp >= 50 and temp < 60:
+            fanspeed = 150
+        case _ if temp >= 60 and temp < 70:
+            fanspeed = 200
+        case _:
+            fanspeed = 255
+
+    return fanspeed
+
+
+def __set_fan_speed(speed: int):
+    # Set the fans
+    for fan in THERMAL_SYS_PATHS[__get_ubnt_device()]["fan_pwms"]:
+        try:
+            with open(fan, "w") as f:
+                f.write(str(speed))
+        except FileNotFoundError:
+            print(
+                f"Error: Unable to write to PWM at {path}! Why can't we set fan speed!?"
+            )
+            raise
+
+
+if __name__ == "__main__":
+    # Trigger our model load so it's cached
+    __get_ubnt_device()
+
+    # Cache so we only write to PWMs if this changes
+    last_fanspeed = 0
+
+    print("unvr-fan-daemon starting...")
+
+    # Start with debug write to max speed so we hear it :)
+    __set_fan_speed(255)
+    time.sleep(1)
+
+    # Start our main loop
+    while True:
+        # Get the fanspeed we wanna set based on temps
+        temp = (
+            sorted(__get_board_temps() + __get_disk_temps(), reverse=True)[0] // 1000
+        )  # Move temp to C, ignore decimals
+        fanspeed = __calculate_fan_speed(temp)
+
+        # If there's a change in calculated fan speed, set it
+        if last_fanspeed != fanspeed:
+            print(f"Setting fan PWMs to {fanspeed} due to temp of {temp}C")
+            __set_fan_speed(fanspeed)
+            last_fanspeed = fanspeed
+
+        # Sleep and run again
+        time.sleep(5)

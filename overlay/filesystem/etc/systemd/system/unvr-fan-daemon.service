@@ -1,0 +1,14 @@
+[Unit]
+Description=Fan Controller daemon for the UNVR Pro
+Requires=load-ubnt-modules.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/unvr-fan-daemon
+KillMode=process
+Restart=on-failure
+RestartSec=2s
+TimeoutStopSec=2s
+
+[Install]
+WantedBy=multi-user.target

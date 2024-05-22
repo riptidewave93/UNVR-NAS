@@ -1,0 +1,11 @@
+[Unit]
+Description=Load UBNT kernel modules
+
+[Service]
+User=root
+Type=oneshot
+ExecStart=/usr/sbin/modprobe ubnthal
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=ulcmd reboot hook
+DefaultDependencies=no
+Before=reboot.target
+
+[Service]
+ExecStart=/usr/bin/ulcmd --sender system-hook --command restart
+Type=oneshot
+
+[Install]
+WantedBy=reboot.target

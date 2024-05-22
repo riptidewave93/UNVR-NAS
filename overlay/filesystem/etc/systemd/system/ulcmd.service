@@ -1,0 +1,15 @@
+[Unit]
+Description=Daemon for MCU based LCM control
+Requires=load-ubnt-modules.service
+Requires=mock-ubnt-api.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ulcmd
+KillMode=process
+Restart=on-failure
+RestartSec=2s
+TimeoutStopSec=2s
+
+[Install]
+WantedBy=multi-user.target

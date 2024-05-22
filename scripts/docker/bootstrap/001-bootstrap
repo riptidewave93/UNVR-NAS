@@ -15,9 +15,13 @@ apt-get clean
 apt-get update
 apt-mark hold linux-image-* # We do not want these, as we run our own kernel!
 
-# Setup ulcmd
-systemctl enable ulcmd
+# Setup our services
+systemctl enable load-ubnt-modules
 systemctl enable mock-ubnt-api
+systemctl enable ulcmd
+systemctl enable ulcmd-reboot-hook
+systemctl enable ulcmd-shutdown-hook
+systemctl enable unvr-fan-daemon
 
 # Now that we have our wanted kernel in place, do the rest of our installs
 apt-get -o Dpkg::Options::="--force-confold" -y --allow-downgrades \

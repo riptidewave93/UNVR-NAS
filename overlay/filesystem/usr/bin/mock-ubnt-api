@@ -4,7 +4,8 @@ import socket
 
 app = Flask(__name__)
 
-@app.route('/api/info')
+
+@app.route("/api/info")
 def api_info():
     print(socket.gethostname())
     payload = {
@@ -13,11 +14,12 @@ def api_info():
     }
     return jsonify(payload)
 
-# No controllers for you
-@app.route('/api/controllers')
-def api_controllers():
-    payload = {}
-    return jsonify(payload)
 
-if __name__ == '__main__':
+# No controllers for you
+@app.route("/api/controllers")
+def api_controllers():
+    return jsonify({})
+
+
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=11081)

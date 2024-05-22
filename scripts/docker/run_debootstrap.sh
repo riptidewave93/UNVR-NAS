@@ -43,7 +43,6 @@ console-common	console-data/keymap/full	select	us
 " > ${build_path}/rootfs/debconf.set
 
 # Copy over stuff for ulcmd, this is hacky, but that's this ENTIRE repo for you
-mv "${build_path}/fw-extract/rootfs/lib/systemd/system/ulcmd.service" "${build_path}/rootfs/lib/systemd/system/ulcmd.service"
 mv "${build_path}/fw-extract/rootfs/usr/bin/ulcmd" "${build_path}/rootfs/usr/bin/ulcmd" # LCD controller
 mv "${build_path}/fw-extract/rootfs/usr/share/firmware" "${build_path}/rootfs/usr/share/" # LCD panel firmwares
 mkdir -p "${build_path}/rootfs/usr/lib/ubnt-fw/" # Home for ulcmd libraries
@@ -51,7 +50,6 @@ for file in libgrpc++.so.1 libgrpc.so.10 libprotobuf.so.23 \
 	libssl.so.1.1 libcrypto.so.1.1 libabsl*.so.20200923 libatomic.so.1; do
 	cp -H ${build_path}/fw-extract/rootfs/usr/lib/aarch64-linux-gnu/${file} "${build_path}/rootfs/usr/lib/ubnt-fw/"
 done
-sed -i 's|Type=simple|Type=simple\nEnvironment="LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/ubnt-fw"|g' "${build_path}/rootfs/lib/systemd/system/ulcmd.service" # Add library path
 
 # Kick off bash setup script within chroot
 cp ${docker_scripts_path}/bootstrap/001-bootstrap ${build_path}/rootfs/bootstrap

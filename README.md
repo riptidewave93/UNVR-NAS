@@ -8,7 +8,7 @@ Firmware builder to convert your Unifi NVR Pro into an OpenMediaVault NAS applia
 
 * UNVR Pro
 
-Note that the 1U UNVR is not currently supported!
+Note that the 1U UNVR is not currently supported as I do not have a unit to test on. PR's are welcome!
 
 ## Usage
 
@@ -25,9 +25,9 @@ Note that the 1U UNVR is not currently supported!
 
 ## Installation
 
-Note that currently the install process requires UART to modify the u-boot env for booting.
+Note that currently the install process requires UART to modify the u-boot env for booting. In the future, if I can get the latest kernel GPL source, this will not be required.
 
-1. Make sure your UNVR is running the same Unifi firmware as referenced in the README.md in the unifi-firmware directory.
+1. Make sure your UNVR Pro is running the same Unifi firmware as referenced in the README.md in the unifi-firmware directory.
 1. Build the firmware image (follow the Usage section), and then throw it on an HDD/SSD formatted to ext4. Put said HDD in the UNVR Pro as the only hard drive.
 2. Hook up UART to the UNVR Pro (4 pin header on the PCB near the DC Power Backup port).
 3. Boot the UNVR Pro, and press Escape twice when prompted to get to the u-boot shell. You only have 2 seconds to do this!
@@ -58,7 +58,7 @@ Note that currently the install process requires UART to modify the u-boot env f
     reboot
     ```
 
-8. At this point you can remove the HDD/SSD you used, and enjoy Debian 12 with OpenMediaVault on your UNVR Pro! Default login for OpenMediaVault is `admin:openmediavault`. SSH login information is `debian:debian`.
+8. At this point you can remove the HDD/SSD you used, and enjoy Debian 12 with OpenMediaVault on your UNVR Pro! Default login for OpenMediaVault is `admin:openmediavault`. SSH login information is `debian:debian`. Please note that first boot may take a bit as cloud-init runs to finish the setup.
 
 ## Removal
 
@@ -87,15 +87,14 @@ To restore back to the factory UNVR-Pro firmware, you can do the following steps
 * Installation is Hard
     * Need to simplify the install process, this should be much easier once I can get latest GPL kernel source (no more uboot env stuff)
 * Touchscreen
-    * disks do not populate atm, cuz no grpc service mocking/replacing ustated
+    * Disks do not populate ATM, because there is no grpc service mocking/replacing ustated, which ulcmd uses to get disk info.
 * OpenMediaVault
     * BTRFS does not work, period
         * No kernel module in UBNT kernel, need new kernel source and we can make so many things better...
-* Fans
-    * No service monitoring temps to adjust fan speed, so fans just stay at low spin from u-boot. Fans are on an i2c adt7475 controller
+        * Might try to build an out-of-tree module for this, more research needed 
 * Reset Button
     * Does literally nothing ATM, not sure if it's worth having it do something or not
 
 ## Disclaimer
 
-Note that since prebuild Ubiquiti software is required for this tool to work, this repo will never have prebuilt images available. This is to prevent redistribution of Ubiquiti's IP, so please do not ask! Also, by using this repo you accept all risk associated with it including but not limited to voiding your warranty and releasing all parties from any liability associated with your device and this software.
+Note that since prebuild Ubiquiti software is required for this tool to work, this repo will never have prebuilt images available. This is to prevent redistribution of Ubiquiti's IP, so please DO NOT ASK! Also, by using this repo you accept all risk associated with it including but not limited to voiding your warranty and releasing all parties from any liability associated with your device and this software.

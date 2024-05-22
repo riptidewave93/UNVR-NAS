@@ -1,0 +1,11 @@
+[Unit]
+Description=ulcmd shutdown hook
+DefaultDependencies=no
+Before=shutdown.target halt.target
+
+[Service]
+ExecStart=/usr/bin/ulcmd --sender system-hook --command poweroff
+Type=oneshot
+
+[Install]
+WantedBy=shutdown.target halt.target
