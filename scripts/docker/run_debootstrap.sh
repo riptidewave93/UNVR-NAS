@@ -51,7 +51,7 @@ for file in libgrpc++.so.1 libgrpc.so.10 libprotobuf.so.23 \
 	libssl.so.1.1 libcrypto.so.1.1 libabsl*.so.20200923 libatomic.so.1; do
 	cp -H ${build_path}/fw-extract/rootfs/usr/lib/aarch64-linux-gnu/${file} "${build_path}/rootfs/usr/lib/ubnt-fw/"
 done
-sed -i 's|Type=simple|Type=simple\nEnvironment="LD_LIBRARY_PATH=/usr/lib/ubnt-fw"|g' "${build_path}/rootfs/lib/systemd/system/ulcmd.service" # Add library path
+sed -i 's|Type=simple|Type=simple\nEnvironment="LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/ubnt-fw"|g' "${build_path}/rootfs/lib/systemd/system/ulcmd.service" # Add library path
 
 # Kick off bash setup script within chroot
 cp ${docker_scripts_path}/bootstrap/001-bootstrap ${build_path}/rootfs/bootstrap

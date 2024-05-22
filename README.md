@@ -27,9 +27,10 @@ Note that the 1U UNVR is not currently supported!
 
 Note that currently the install process requires UART to modify the u-boot env for booting.
 
+1. Make sure your UNVR is running the same Unifi firmware as referenced in the README.md in the unifi-firmware directory.
 1. Build the firmware image (follow the Usage section), and then throw it on an HDD/SSD formatted to ext4. Put said HDD in the UNVR Pro as the only hard drive.
-2. Hook up UART to the UNVR Pro (4 pin header on the PCB near the DC Power Backup port)
-3. Boot the UNVR Pro, and press esc twice when prompted to get to the u-boot shell
+2. Hook up UART to the UNVR Pro (4 pin header on the PCB near the DC Power Backup port).
+3. Boot the UNVR Pro, and press Escape twice when prompted to get to the u-boot shell. You only have 2 seconds to do this!
 4. Run the following commands to update the kernel cmdline and save the changes:
 
     ```
@@ -43,15 +44,18 @@ Note that currently the install process requires UART to modify the u-boot env f
     `run bootcmdrecovery`
 
 6. Once recovery boots up, login with `ubnt:ubnt` or `root:ubnt`. You can also use telnet for this instead of UART if you prefer.
-7. Mount your HDD with the firmware image, backup the Unifi firmware, and then flash our custom firmware to the EMMC. (below command example assumes your ext4 disk partition is at /dev/sda1)
+7. Mount your HDD with the firmware image, backup the Unifi firmware, your u-boot env partitions, and then flash our custom firmware to the EMMC. (below command example assumes your ext4 disk partition is at /dev/sda1)
 
     ```
     mount /dev/sda1 /mnt
     cd /mnt
-    dd if=/dev/boot of=./unvrpro-emmc-backup.bin bs=4M
+    dd if=/dev/boot of=/mnt/unvrpro-emmc-backup.bin bs=4M
+    dd if=/dev/mtd1 of=/mnt/unvrpro-mtd1-uboot-env.bin
+    dd if=/dev/mtd2 of=/mnt/unvrpro-mtd2-uboot-env-redundant.bin
     gunzip debian-UNVRPRO.img.gz
     dd if=./debian-UNVRPRO.img of=/dev/boot bs=4M
-    sync; reboot
+    sync
+    reboot
     ```
 
 8. At this point you can remove the HDD/SSD you used, and enjoy Debian 12 with OpenMediaVault on your UNVR Pro! Default login for OpenMediaVault is `admin:openmediavault`. SSH login information is `debian:debian`.

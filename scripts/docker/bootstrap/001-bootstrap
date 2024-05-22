@@ -24,7 +24,8 @@ apt-get -o Dpkg::Options::="--force-confold" -y --allow-downgrades \
     --allow-remove-essential --allow-change-held-packages install cloud-init \
     bsdextrautils git binutils ca-certificates e2fsprogs haveged parted curl \
     locales console-common openssh-server less vim net-tools wireguard-tools \
-    ntpsec u-boot-tools wget u-boot-menu initramfs-tools python3-flask gnupg
+    ntpsec u-boot-tools wget u-boot-menu initramfs-tools python3-flask gnupg \
+    libc-ares2
 
 # Locale gen
 locale-gen
@@ -48,12 +49,6 @@ apt-get --yes --auto-remove --show-upgraded \
     --option DPkg::Options::="--force-confdef" \
     --option DPkg::Options::="--force-confold" \
     install openmediavault openmediavault-md || true # We "fail" all apt cmds from here on til we boot on HW
-
-# Disable systemd-networkd
-systemctl disable systemd-networkd
-systemctl disable systemd-networkd-wait-online
-systemctl mask systemd-networkd
-systemctl mask systemd-networkd-wait-online
 
 # Cleanup stuff we don't want floating around
 apt-get autoclean || true
