@@ -86,14 +86,12 @@ To restore back to the factory UNVR-Pro firmware, you can do the following steps
 
 * Installation is Hard
     * Need to simplify the install process, this should be much easier once I can get latest GPL kernel source (no more uboot env stuff)
-* Touchscreen
-    * Disks do not populate ATM, because there is no grpc service mocking/replacing ustated, which ulcmd uses to get disk info.
 * OpenMediaVault
     * BTRFS does not work, period
         * No kernel module in UBNT kernel, need new kernel source and we can make so many things better...
         * Might try to build an out-of-tree module for this, more research needed 
 * Reset Button
-    * Does literally nothing ATM, not sure if it's worth having it do something or not
+    * Only works to reboot the system
 
 ## Disclaimer
 

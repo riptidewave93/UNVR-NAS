@@ -1,10 +1,9 @@
 #!/usr/bin/python3
-from functools import lru_cache
 import os
 import re
 import time
 
-UBNTHAL_PATH = "/proc/ubnthal/system.info"
+from ubnthelpers import get_ubnt_shortname
 
 SMARTCTL_PATH = "/usr/sbin/smartctl"
 
@@ -25,28 +24,15 @@ THERMAL_SYS_PATHS = {
 }
 
 
-@lru_cache(None)
-def __get_ubnt_device():
-    try:
-        with open(UBNTHAL_PATH, "r") as f:
-            ubnthal_model = [i for i in f.readlines() if i.startswith("shortname=")][0]
-        return ubnthal_model.lstrip("shortname=").rstrip("\n")
-    except FileNotFoundError:
-        print(
-            f"Error: unable to open {UBNTHAL_PATH}; is the ubnthal kernel module loaded?!"
-        )
-        raise
-
-
 def __get_board_temps():
     # Are we supported?
-    if __get_ubnt_device() not in THERMAL_SYS_PATHS:
+    if get_ubnt_shortname() not in THERMAL_SYS_PATHS:
         raise Exception(
-            f"Error: Your Unifi device of {__get_ubnt_device()} is not yet supported by unvr-fan-daemon! Exiting..."
+            f"Error: Your Unifi device of {get_ubnt_shortname()} is not yet supported by unvr-fan-daemon! Exiting..."
         )
     # For each of our paths, get the temps, and append to single return list
     board_temps = []
-    for path in THERMAL_SYS_PATHS[__get_ubnt_device()]["thermal"]:
+    for path in THERMAL_SYS_PATHS[get_ubnt_shortname()]["thermal"]:
         try:
             with open(path, "r") as f:
                 board_temps.append(int(f.readline().rstrip("\n")))
@@ -74,6 +60,7 @@ def __get_disk_temps():
     # For each disk, get the temp, and append to our list
     disk_temps = []
     for dev in devices:
+        # Sadly this is slow, SMART data pulls are not fast...
         dev_temp = re.search(
             r"^194 [\w-]+\s+0x\d+\s+\d+\s+\d+\s+\d+\s+[\w-]+\s+\w+\s+\S+\s+(\d+)(?:\s[\(][^)]*[\)])?$",
             os.popen(f"{SMARTCTL_PATH} -A {dev}").read(),
@@ -104,21 +91,28 @@ def __calculate_fan_speed(temp):
 
 def __set_fan_speed(speed: int):
     # Set the fans
-    for fan in THERMAL_SYS_PATHS[__get_ubnt_device()]["fan_pwms"]:
+    for fan in THERMAL_SYS_PATHS[get_ubnt_shortname()]["fan_pwms"]:
         try:
             with open(fan, "w") as f:
                 f.write(str(speed))
         except FileNotFoundError:
             print(
-                f"Error: Unable to write to PWM at {path}! Why can't we set fan speed!?"
+                f"Error: Unable to write to PWM at {fan}! Why can't we set fan speed!?"
             )
             raise
 
 
-if __name__ == "__main__":
-    # Trigger our model load so it's cached
-    __get_ubnt_device()
+def __write_out_temp(temp: int, path: str = "/tmp/.unvr_temp"):
+    try:
+        with open(path, "w+") as f:
+            f.write(str(temp))
+    except (IOError, OSError, PermissionError) as e:
+        print(
+            f"Warning: Unable to write to temp file at {path}; ulcmd won't get the system temp! Error was: {e}"
+        )
 
+
+if __name__ == "__main__":
     # Cache so we only write to PWMs if this changes
     last_fanspeed = 0
 
@@ -126,15 +120,19 @@ if __name__ == "__main__":
 
     # Start with debug write to max speed so we hear it :)
     __set_fan_speed(255)
-    time.sleep(1)
+    time.sleep(0.5)
 
     # Start our main loop
     while True:
         # Get the fanspeed we wanna set based on temps
         temp = (
-            sorted(__get_board_temps() + __get_disk_temps(), reverse=True)[0] // 1000
-        )  # Move temp to C, ignore decimals
+            sorted(__get_board_temps() + __get_disk_temps(), reverse=True)[0] / 1000.0
+        )  # Move temp to C
+
         fanspeed = __calculate_fan_speed(temp)
+
+        # Write out for consumption by ulcmd via mock-ubnt-api
+        __write_out_temp(temp)
 
         # If there's a change in calculated fan speed, set it
         if last_fanspeed != fanspeed:
@@ -143,4 +141,4 @@ if __name__ == "__main__":
             last_fanspeed = fanspeed
 
         # Sleep and run again
-        time.sleep(5)
+        time.sleep(10)

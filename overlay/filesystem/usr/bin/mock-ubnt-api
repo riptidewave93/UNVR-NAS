@@ -1,16 +1,39 @@
 #!/usr/bin/python3
+import os
+
 from flask import Flask, jsonify
+from functools import lru_cache
 import socket
+
+
+def __get_system_temp():
+    try:
+        with open("/tmp/.unvr_temp", "r") as f:
+            return float(f.read())
+    except (IOError, OSError, PermissionError) as e:
+        print(f"Warning: Unable to get device temp!")
+        return None
+
+
+@lru_cache(None)
+def __get_omv_version():
+    return os.popen("dpkg-query -W -f='${Version}' openmediavault").read()
+
 
 app = Flask(__name__)
 
 
 @app.route("/api/info")
 def api_info():
-    print(socket.gethostname())
     payload = {
         "isSetup": True,
         "hostname": socket.gethostname(),
+        "hardware": {
+            "firmwareVersion": f"OMV {__get_omv_version()}",  # OMV version
+        },
+        "cpu": {
+            "temperature": __get_system_temp(),
+        },
     }
     return jsonify(payload)
 
@@ -18,7 +41,7 @@ def api_info():
 # No controllers for you
 @app.route("/api/controllers")
 def api_controllers():
-    return jsonify({})
+    return jsonify([])
 
 
 if __name__ == "__main__":

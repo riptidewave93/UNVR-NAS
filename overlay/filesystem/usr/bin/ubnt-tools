@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ "$1" == "id" ]; then
+    BOARD_SYSID=$(grep systemid /proc/ubnthal/system.info | sed 's|systemid=||g')
+    BOARD_SERIALNO=$(grep serialno /proc/ubnthal/system.info | sed 's|serialno=||g')
+    # BOM is in SPI on EEPROM part, offset D000 is start of TlvInfo. BOM starts with 113-
+    BOARD_BOM=$(dd if=/dev/mtd4 bs=64 skip=832 count=1 status=none | strings | grep 113-)
+    echo "board.sysid=0x${BOARD_SYSID}"
+    echo "board.serialno=${BOARD_SERIALNO}"
+    echo "board.bom=${BOARD_BOM}"
+else
+    echo "Unknown ubnt-tools cmd: $@" >> /tmp/ubnt-tools-unknown.log
+fi
