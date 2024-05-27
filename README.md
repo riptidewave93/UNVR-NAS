@@ -17,7 +17,7 @@ Note that the 1U UNVR is not currently supported as I do not have a unit to test
 
     `docker-ce losetup wget sudo make qemu-user-static squashfs-tools`
 
-3. Run the tool, and sit back and wait for it to do it's thing. Depending on your computer, this may take around an hour or so.
+3. Run the tool, and sit back and wait for it to do it's thing. Depending on your computer, this may take around an hour or so. Also note near the end there will be some scary errors during debootstrap, but this is expected.
 
     `make`
 
@@ -27,7 +27,8 @@ Note that the 1U UNVR is not currently supported as I do not have a unit to test
 
 Note that currently the install process requires UART to modify the u-boot env for booting. In the future, if I can get the latest kernel GPL source, this will not be required.
 
-1. Make sure your UNVR Pro is running the same Unifi firmware as referenced in the README.md in the unifi-firmware directory.
+1. MAKE SURE your UNVR Pro is running the same Unifi firmware as referenced in the README.md in the unifi-firmware directory.
+    * **Failure to do this can cause issues from the installation process not working, to the touch screen not working!**
 1. Build the firmware image (follow the Usage section), and then throw it on an HDD/SSD formatted to ext4. Put said HDD in the UNVR Pro as the only hard drive.
 2. Hook up UART to the UNVR Pro (4 pin header on the PCB near the DC Power Backup port).
 3. Boot the UNVR Pro, and press Escape twice when prompted to get to the u-boot shell. You only have 2 seconds to do this!
@@ -39,11 +40,11 @@ Note that currently the install process requires UART to modify the u-boot env f
     saveenv
     ```
 
-5. Boot into recovery (can use the below command)
+5. Boot into recovery. This can be done using the command below, or by unplugging the UNVR Pro, and holding the reset button for 10~ seconds as you power it back up.
 
     `run bootcmdrecovery`
 
-6. Once recovery boots up, login with `ubnt:ubnt` or `root:ubnt`. You can also use telnet for this instead of UART if you prefer.
+6. Once recovery is booted, login with `ubnt:ubnt` or `root:ubnt`. Note this can be done either via UART, or by telnet to the IP address your UNVR Pro display reports.
 7. Mount your HDD with the firmware image, backup the Unifi firmware, your u-boot env partitions, and then flash our custom firmware to the EMMC. (below command example assumes your ext4 disk partition is at /dev/sda1)
 
     ```
@@ -65,9 +66,22 @@ Note that currently the install process requires UART to modify the u-boot env f
 To restore back to the factory UNVR-Pro firmware, you can do the following steps:
 
 1. Hold the "reset" button on the front while powering on to boot into recovery
-2. Once the display shows it's in recovery, telnet to the IP address. At the login prompt, login with `ubnt:ubnt` or `root:ubnt`.
-3. Erase the uboot env, to remove our custom boot commands. This SHOULD be mtd1/mtd2, but **PLEASE VERIFY** first with `cat /proc/mtd` to prevent bricking your device!
-4. Once the uboot env's are identified, erase them:
+2. Once the display shows it's in recovery, telnet to the IP address shown on the touch screen. At the login prompt, login with `ubnt:ubnt` or `root:ubnt`.
+3. Erase the uboot env, to remove our custom boot commands. This SHOULD be mtd1/mtd2, but **PLEASE VERIFY** first with `cat /proc/mtd` to prevent bricking your device! **DO NOT SKIP THIS STEP!** The output should match below, if not, **PLEASE DO NOT CONTINUE!**
+    
+    ```
+    $ cat /proc/mtd
+    dev:    size   erasesize  name
+    mtd0: 001c0000 00001000 "u-boot"
+    mtd1: 00010000 00001000 "u-boot env"
+    mtd2: 00010000 00001000 "u-boot env redundant"
+    mtd3: 00010000 00001000 "Factory"
+    mtd4: 00010000 00001000 "EEPROM"
+    mtd5: 01000000 00001000 "recovery kernel"
+    mtd6: 00e00000 00001000 "config"
+    ```
+
+4. Once the uboot env's are identified, erase them to remove the setting overrides we added during install:
 
     ```
     dd if=/dev/zero of=/dev/mtd1

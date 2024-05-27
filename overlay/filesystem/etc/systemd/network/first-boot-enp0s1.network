@@ -1,0 +1,13 @@
+[Match]
+Name=enp0s1
+
+[Network]
+DHCP=ipv4
+LinkLocalAddressing=ipv6
+IPv6AcceptRA=yes
+IPv6PrivacyExtensions=yes
+
+[DHCP]
+RouteMetric=100
+UseMTU=true
+UseDomains=true

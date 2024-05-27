@@ -28,8 +28,8 @@ apt-get -o Dpkg::Options::="--force-confold" -y --allow-downgrades \
     --allow-remove-essential --allow-change-held-packages install cloud-init \
     bsdextrautils git binutils ca-certificates e2fsprogs haveged parted curl \
     locales console-common openssh-server less vim net-tools wireguard-tools \
-    ntpsec u-boot-tools wget u-boot-menu initramfs-tools python3-flask gnupg \
-    libc-ares2
+    ntpsec u-boot-tools wget initramfs-tools python3-flask gnupg libc-ares2  \
+    dfu-util
 
 # Locale gen
 locale-gen
@@ -53,6 +53,16 @@ apt-get --yes --auto-remove --show-upgraded \
     --option DPkg::Options::="--force-confdef" \
     --option DPkg::Options::="--force-confold" \
     install openmediavault openmediavault-md || true # We "fail" all apt cmds from here on til we boot on HW
+
+# Setup NICs for OMV to manage
+jq --null-input --compact-output \
+    "{uuid: \"fa4b1c66-ef79-11e5-87a0-0002b3a176b4\", devicename: \"enp0s1\", method: \"dhcp\", method6: \"auto\"}" | \
+    omv-confdbadm update "conf.system.network.interface" -
+jq --null-input --compact-output \
+    "{uuid: \"fa4b1c66-ef79-11e5-87a0-0002b3a176b4\", devicename: \"enp0s2\", method: \"dhcp\", method6: \"auto\"}" | \
+    omv-confdbadm update "conf.system.network.interface" -
+# Set hostname
+omv-confdbadm update "conf.system.network.dns" "{\"hostname\": \"unvr-nas\"}"
 
 # Cleanup stuff we don't want floating around
 apt-get autoclean || true

@@ -79,9 +79,13 @@ def __calculate_fan_speed(temp):
             fanspeed = 25
         case _ if temp >= 40 and temp < 50:
             fanspeed = 75
-        case _ if temp >= 50 and temp < 60:
-            fanspeed = 150
-        case _ if temp >= 60 and temp < 70:
+        case _ if temp >= 50 and temp < 55:
+            fanspeed = 100
+        case _ if temp >= 55 and temp < 60:
+            fanspeed = 130
+        case _ if temp >= 60 and temp < 65:
+            fanspeed = 160
+        case _ if temp >= 65 and temp < 70:
             fanspeed = 200
         case _:
             fanspeed = 255
