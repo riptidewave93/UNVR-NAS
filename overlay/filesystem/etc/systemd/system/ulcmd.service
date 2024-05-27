@@ -1,6 +1,6 @@
 [Unit]
 Description=Daemon for MCU based LCM control
-Requires=load-ubnt-modules.service
+Requires=ubnt-init.service
 Requires=mock-ubnt-api.service
 
 [Service]

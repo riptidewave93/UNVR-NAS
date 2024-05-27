@@ -1,6 +1,6 @@
 [Unit]
 Description=Fan Controller daemon for the UNVR Pro
-Requires=load-ubnt-modules.service
+Requires=ubnt-init.service
 
 [Service]
 Type=simple
