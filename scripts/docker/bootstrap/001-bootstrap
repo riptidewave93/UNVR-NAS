@@ -16,7 +16,7 @@ apt-get update
 apt-mark hold linux-image-* # We do not want these, as we run our own kernel!
 
 # Setup our services
-systemctl enable load-ubnt-modules
+systemctl enable ubnt-init
 systemctl enable mock-ubnt-api
 systemctl enable ulcmd
 systemctl enable ulcmd-reboot-hook

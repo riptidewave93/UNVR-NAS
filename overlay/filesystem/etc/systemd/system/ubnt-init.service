@@ -1,10 +1,10 @@
 [Unit]
-Description=Load UBNT kernel modules
+Description=UBNT bootup init script
 
 [Service]
 User=root
 Type=oneshot
-ExecStart=/usr/sbin/modprobe ubnthal
+ExecStart=/usr/lib/init/boot/ubnt-init.sh
 RemainAfterExit=yes
 
 [Install]
