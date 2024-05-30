@@ -60,21 +60,33 @@ def __find_and_map_disks():
                 disk_smartdata = os.popen(
                     f"{SMARTCTL_PATH} -iHA /dev/{disk_node}"
                 ).read()
-                disk_temp = int(
-                    __parse_smartctl(
-                        disk_smartdata,
-                        r"^194 [\w-]+\s+0x\d+\s+\d+\s+\d+\s+\d+\s+[\w-]+\s+\w+\s+\S+\s+(\d+)(?:\s[\(][^)]*[\)])?$",
+
+                try:
+                    disk_temp = int(
+                        __parse_smartctl(
+                            disk_smartdata,
+                            r"^194 [\w-]+\s+0x\d+\s+\d+\s+\d+\s+\d+\s+[\w-]+\s+\w+\s+\S+\s+(\d+)(?:\s[\(][^)]*[\)])?$",
+                        )
                     )
-                )
-                disk_bad_sectors = int(
-                    __parse_smartctl(
-                        disk_smartdata,
-                        r"^  5 [\w-]+\s+0x\d+\s+\d+\s+\d+\s+\d+\s+[\w-]+\s+\w+\s+\S+\s+(\d+)(?:\s[\(][^)]*[\)])?$",
+                except:
+                    disk_temp = None
+
+                try:
+                    disk_bad_sectors = int(
+                        __parse_smartctl(
+                            disk_smartdata,
+                            r"^  5 [\w-]+\s+0x\d+\s+\d+\s+\d+\s+\d+\s+[\w-]+\s+\w+\s+\S+\s+(\d+)(?:\s[\(][^)]*[\)])?$",
+                        )
                     )
-                )
-                disk_size = int(__read_file(f"/sys/block/{disk_node}/size")) * int(
-                    __read_file(f"/sys/block/{disk_node}/queue/logical_block_size")
-                )
+                except:
+                    disk_bad_sectors = None
+                
+                try:
+                    disk_size = int(__read_file(f"/sys/block/{disk_node}/size")) * int(
+                        __read_file(f"/sys/block/{disk_node}/queue/logical_block_size")
+                    )
+                except:
+                    disk_size = None
 
                 # Do we pass SMART testing?
                 if "PASSED" in __parse_smartctl(

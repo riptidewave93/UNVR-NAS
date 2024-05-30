@@ -68,9 +68,10 @@ def main(fwfile: str, savedir: str):
                     file_header[4:33].decode("utf-8").rstrip("\x00")
                 )  # Name/type of FILE
                 file_length = int(file_header[48:52].hex(), 16)
-                print(
-                    f"{file_name} is at offset {"0x%0.2X" % file_location}, {file_length} bytes"
-                )
+                # Disabled because it's debug info and older python can't handle it
+                #print(
+                #    f"{file_name} is at offset {"0x%0.2X" % file_location}, {file_length} bytes"
+                #)
                 # print(int(file_header[52:56].hex(), 16)) # Maybe reserved memory or partition size? We don't use this tho
                 fcount = fcount + 1  # Increment on find!
 
