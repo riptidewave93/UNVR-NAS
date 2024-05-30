@@ -10,6 +10,9 @@ export APT_LISTCHANGES_FRONTEND=none
 debconf-set-selections /debconf.set
 rm -f /debconf.set
 
+# Run depmod for our kernel so we pick up btrfs + more
+depmod -a 4.19.152-alpine-unvr
+
 # Initial package install
 apt-get clean
 apt-get update

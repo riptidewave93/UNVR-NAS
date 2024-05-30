@@ -19,9 +19,14 @@ debootstrap --no-check-gpg --foreign --arch=${deb_arch} --include=apt-transport-
 cp /usr/bin/qemu-aarch64-static usr/bin/
 chroot ${build_path}/rootfs /debootstrap/debootstrap --second-stage
 
-# Copy over our kernel modules and kernel
-mv -f "${build_path}/fw-extract/rootfs/lib/modules" ${build_path}/rootfs/lib
+# Copy over our kernel modules and kernel from the FS image
+# Note that in the future, we wanna use our own kernel, but the current GPL is way too old!!!!!
+mv -f "${build_path}/fw-extract/rootfs/lib/modules" "${build_path}/rootfs/lib"
 cp "${build_path}/fw-extract/kernel.bin" "${build_path}/rootfs/boot/uImage"
+
+# Now, for the old kernel we built, pull in btrfs + depends modules (we do depmod in bootstrap)
+cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/lib/zstd/zstd_compress.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
+cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/fs/btrfs/btrfs.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
 
 # Copy over our overlay if we have one
 if [[ -d ${root_path}/overlay/${fs_overlay_dir}/ ]]; then

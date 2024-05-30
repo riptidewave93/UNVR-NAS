@@ -40,6 +40,7 @@ RUN apt-get update && apt-get install -yq \
     qemu-user-static \
     rsync \
     swig \
+    u-boot-tools \
     unzip \
     uuid-runtime \
     wget \

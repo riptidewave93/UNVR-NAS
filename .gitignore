@@ -2,3 +2,4 @@
 unifi-firmware/*.bin
 BuildEnv
 output
+downloads
