@@ -7,6 +7,18 @@ scripts_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 debug_msg "Starting 03_docker.sh"
 
+# Start with things we can do now
+if [ ! -d ${build_path}/toolchain ]; then
+    debug_msg "Setting up the toolchain for docker..."
+    mkdir -p ${build_path}/toolchain
+    tar -xf ${root_path}/downloads/${toolchain_filename} -C ${build_path}/toolchain
+fi
+
+if [ ! -d ${build_path}/kernel ]; then
+    debug_msg "Docker: Building Kernel..."
+    docker run --ulimit nofile=1024 --rm -v "${root_path}:/repo:Z" -it ${docker_tag} /repo/scripts/docker/build_kernel.sh
+fi
+
 debug_msg "Doing safety checks... please enter your password for sudo if prompted..."
 # Before we do anything, make our dirs, and validate they are not mounted atm. If they are, exit!
 if mountpoint -q ${build_path}/rootfs/boot; then

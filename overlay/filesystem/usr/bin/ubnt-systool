@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$1" == "poweroff" ]; then
-    poweroff
+    poweroff --halt
 elif [ "$1" == "reboot" ]; then
     reboot
 else

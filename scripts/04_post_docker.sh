@@ -20,6 +20,6 @@ docker run --rm -v "${root_path}:/repo:Z" -it ${docker_tag} /repo/scripts/docker
 TIMESTAMP=`date +%Y%m%d-%H%M`
 mkdir -p ${root_path}/output/${TIMESTAMP}
 mv ${build_path}/final/debian*.img.gz ${root_path}/output/${TIMESTAMP}/
-sudo rm -rf ${build_path} # Be gone, we done buildin! :) 
+#sudo rm -rf ${build_path} # Be gone, we done buildin! :) 
 
 debug_msg "Finished 04_post_docker.sh"
