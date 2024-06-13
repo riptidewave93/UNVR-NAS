@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -yq \
     bsdextrautils \
     build-essential \
     cpio \
+    curl \
     debootstrap \
     debhelper \
     device-tree-compiler \
@@ -26,9 +27,14 @@ RUN apt-get update && apt-get install -yq \
     kpartx \
     libconfuse-common \
     libconfuse-dev \
+    libdbus-1-dev \
     libelf-dev \
+    libglib2.0-dev \
+    libical-dev \
     libncurses-dev \
+    libreadline-dev \
     libssl-dev \
+    libudev-dev \
     lvm2 \
     mtools \
     parted \
@@ -47,4 +53,11 @@ RUN apt-get update && apt-get install -yq \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && /setup_mkimage.sh \
-    && rm /setup_mkimage.sh
+    && rm /setup_mkimage.sh \
+    && curl -fsSL "https://go.dev/dl/go1.22.4.linux-amd64.tar.gz" -o golang.tar.gz \
+    && tar -C /usr/local -xzf golang.tar.gz \
+    && rm golang.tar.gz \
+    && for bin in `ls /usr/local/go/bin/`; do \
+        update-alternatives --install "/usr/bin/$bin" "$bin" "/usr/local/go/bin/$bin" 1; \
+        update-alternatives --set "$bin" "/usr/local/go/bin/$bin"; \
+    done

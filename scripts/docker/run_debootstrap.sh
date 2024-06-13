@@ -35,8 +35,8 @@ if [[ -d ${root_path}/overlay/${fs_overlay_dir}/ ]]; then
 fi
 
 # Apply our part UUIDs to fstab
-sed -i "s|BOOTUUIDPLACEHOLDER|$(blkid -o value -s UUID ${build_path}/boot.ext4)|g" ${build_path}/rootfs/etc/fstab
-sed -i "s|ROOTUUIDPLACEHOLDER|$(blkid -o value -s UUID ${build_path}/rootfs.ext4)|g" ${build_path}/rootfs/etc/fstab
+#sed -i "s|BOOTUUIDPLACEHOLDER|$(blkid -o value -s UUID ${build_path}/boot.ext4)|g" ${build_path}/rootfs/etc/fstab
+#sed -i "s|ROOTUUIDPLACEHOLDER|$(blkid -o value -s UUID ${build_path}/rootfs.ext4)|g" ${build_path}/rootfs/etc/fstab
 
 # Hostname
 echo "${distrib_name}" > ${build_path}/rootfs/etc/hostname
@@ -55,6 +55,18 @@ for file in libgrpc++.so.1 libgrpc.so.10 libprotobuf.so.23 \
 	libssl.so.1.1 libcrypto.so.1.1 libabsl*.so.20200923 libatomic.so.1; do
 	cp -H ${build_path}/fw-extract/rootfs/usr/lib/aarch64-linux-gnu/${file} "${build_path}/rootfs/usr/lib/ubnt-fw/"
 done
+
+# Copy over bluetooth firmware files
+mkdir -p "${build_path}/rootfs/lib/firmware"
+cp -R "${build_path}/fw-extract/rootfs/lib/firmware/csr8x11" "${build_path}/rootfs/lib/firmware/" # LCD panel firmwares
+
+# Install our bccmd we compiled (less we use from unifi the better)
+cp -R "${build_path}/packages/bluez/bccmd" "${build_path}/rootfs/usr/bin"
+chmod +x "${build_path}/rootfs/usr/bin/bccmd"
+
+# Install our ubnteeprom tool
+cp -R "${build_path}/packages/ubnteeprom/ubnteeprom" "${build_path}/rootfs/usr/bin"
+chmod +x "${build_path}/rootfs/usr/bin/ubnteeprom"
 
 # Kick off bash setup script within chroot
 cp ${docker_scripts_path}/bootstrap/001-bootstrap ${build_path}/rootfs/bootstrap

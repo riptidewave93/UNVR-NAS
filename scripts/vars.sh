@@ -27,6 +27,11 @@ genimage_src="https://github.com/pengutronix/genimage/releases/download/v16/geni
 genimage_filename="$(basename ${genimage_src})"
 genimage_repopath="${genimage_filename%.tar.xz}"
 
+# bluez
+bluez_src="https://github.com/bluez/bluez/archive/refs/tags/5.55.tar.gz"
+bluez_filename="bluez-$(basename ${bluez_src})"
+bluez_repopath="${bluez_filename%.tar.gz}"
+
 # Distro
 distrib_name="debian"
 #deb_mirror="http://ftp.us.debian.org/debian"

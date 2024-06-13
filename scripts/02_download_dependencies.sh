@@ -24,4 +24,10 @@ if [ ! -f ${root_path}/downloads/${kernel_filename} ]; then
     wget ${kernel_src} -O ${root_path}/downloads/${kernel_filename}
 fi
 
+# Bluez
+if [ ! -f ${root_path}/downloads/${bluez_filename} ]; then
+    debug_msg "Downloading Package Bluez..."
+    wget ${bluez_src} -O ${root_path}/downloads/${bluez_filename}
+fi
+
 debug_msg "Finished 02_download_dependencies.sh"
