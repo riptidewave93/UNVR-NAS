@@ -37,9 +37,9 @@ fi
 # some modules. This is why some lines below are commented out.
 
 # Build as normal, with our extra version set to a timestamp
-make ${kernel_config} 
+make ${kernel_config}
 make -j`getconf _NPROCESSORS_ONLN` EXTRAVERSION=-alpine-unvr # Build kernel and modules
-#make -j`getconf _NPROCESSORS_ONLN` EXTRAVERSION=-alpine-unvr Image.gz # makes gzip image
+#make -j`getconf _NPROCESSORS_ONLN` EXTRAVERSION=-alpine-unvr Image.gz # makes gzip image (we should just do this ourselves, skip using make)
 make INSTALL_MOD_PATH=./modules-dir -j`getconf _NPROCESSORS_ONLN` EXTRAVERSION=-alpine-unvr modules_install # installs modules to dir
 #mkimage -A arm64 -O linux -T kernel -C gzip -a 04080000 -e 04080000 -n "Linux-UNVR-NAS-$(date +%Y%m%d-%H%M%S)" -d ./arch/arm64/boot/Image.gz uImage
 

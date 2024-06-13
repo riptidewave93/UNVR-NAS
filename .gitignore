@@ -3,3 +3,4 @@ unifi-firmware/*.bin
 BuildEnv
 output
 downloads
+tools/ubnteeprom/test-files

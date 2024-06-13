@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# turn off fans for shutdown
+if [ -d "/sys/class/hwmon/hwmon0/device" ]; then
+	for pwm in `ls /sys/class/hwmon/hwmon0/device/pwm[0-6]`; do
+		echo 0 > ${pwm}
+	done
+fi
+
+# Ensure all mounts in /srv from OMV are cleaned up
+for dir in `ls /srv | grep dev-disk`; do
+	umount -q /srv/${dir};
+done
+
+# Now for all disks, delete from bus
+for dsk in sd{a..z}; do
+	if [ -d "/sys/block/${dsk}/device" ]; then
+		echo 1 > "/sys/block/${dsk}/device/delete"
+	fi
+done
+
+# Now for all disks, remove them with ui-hdd-pwrctl-v2 if we have it
+if [ -d "/sys/bus/platform/drivers/ui-hdd-pwrctl-v2" ]; then
+	for bay in `seq 0 7`; do
+		echo ${bay} > "$(realpath /sys/bus/platform/drivers/ui-hdd-pwrctl-v2/*hdd_pwrctl-v2)/hdd_force_poweroff"
+	done
+fi
+# Let the disks spool down a sec...
+sleep 2

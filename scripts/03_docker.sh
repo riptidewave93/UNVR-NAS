@@ -18,6 +18,10 @@ if [ ! -d ${build_path}/kernel ]; then
     debug_msg "Docker: Building Kernel..."
     docker run --ulimit nofile=1024 --rm -v "${root_path}:/repo:Z" -it ${docker_tag} /repo/scripts/docker/build_kernel.sh
 fi
+if [ ! -d ${build_path}/packages ]; then
+    debug_msg "Docker: Building Packages..."
+    docker run --ulimit nofile=1024 --rm -v "${root_path}:/repo:Z" -it ${docker_tag} /repo/scripts/docker/build_packages.sh
+fi
 
 debug_msg "Doing safety checks... please enter your password for sudo if prompted..."
 # Before we do anything, make our dirs, and validate they are not mounted atm. If they are, exit!

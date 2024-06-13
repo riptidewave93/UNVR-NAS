@@ -4,7 +4,8 @@ Description=UBNT bootup init script
 [Service]
 User=root
 Type=oneshot
-ExecStart=/usr/lib/init/boot/ubnt-init.sh
+ExecStart=/usr/lib/init/boot/ubnt-init.sh start
+ExecStop=/usr/lib/init/boot/ubnt-init.sh stop
 RemainAfterExit=yes
 
 [Install]

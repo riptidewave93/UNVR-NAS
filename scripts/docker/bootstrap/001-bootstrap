@@ -32,7 +32,10 @@ apt-get -o Dpkg::Options::="--force-confold" -y --allow-downgrades \
     bsdextrautils git binutils ca-certificates e2fsprogs haveged parted curl \
     locales console-common openssh-server less vim net-tools wireguard-tools \
     ntpsec u-boot-tools wget initramfs-tools python3-flask gnupg libc-ares2  \
-    dfu-util
+    dfu-util bluez
+
+# Enable bluetooth
+systemctl enable bluetooth
 
 # Locale gen
 locale-gen
