@@ -52,35 +52,17 @@ function main(){
 			# unvr: nothing to do here
 			;;
 		ea1a)
+			# unvr
 			usb_based_init
 			;;
-		ea20|ea50|ea51)
+		ea20)
+			# unvr-pro
 			gpio_num=$(find_gpio_on_expander 0 0020 8)
 			if [ $gpio_num -lt 0 ]; then
 				return 5
 			fi
 			gpio_reset $gpio_num
 			uart_based_init /dev/ttyS3 "/lib/firmware/csr8x11/csr8x11-a12-bt4.2-patch-2018_uart.psr"
-			;;
-		ea2c|ea15|ea11|ea32)
-			gpio_reset 37
-			uart_based_init /dev/ttyS1 "/lib/firmware/csr8x11/csr8x11-a12-bt4.2-patch-2018_uart.psr"
-			;;
-		ea3d|ea3e)
-			gpio_num=$(find_gpio_on_expander 3 0029 13)
-			if [ $gpio_num -lt 0 ]; then
-				return 5
-			fi
-			gpio_reset $gpio_num
-			uart_based_init /dev/ttyAMA1 "/lib/firmware/csr8x11/pb-207-csr8x11-rev7-flowcontrol.psr" "flow"
-			;;
-		a678|a690|a69a)
-			gpio_reset 490
-			usb_based_init
-			;;
-		e990)
-			gpio_reset 306
-			usb_based_init
 			;;
 		*)
 			return 4
@@ -164,15 +146,6 @@ function uart_based_init(){
 	done
 
 	hciconfig ${BT_DEVICE} up
-}
-
-function usb_based_init(){
-	hciconfig ${BT_DEVICE} up; hciconfig ${BT_DEVICE} up
-	sleep 1
-	bccmd psset -r 0x$((BT_DEVICE_NUM+1)) 0x${BT_MAC:6:2} 00 0x${BT_MAC:10:2} 0x${BT_MAC:8:2} 0x${BT_MAC:4:2} 00 0x${BT_MAC:2:2} 0x${BT_MAC:0:2}
-	sleep 2
-	hciconfig ${BT_DEVICE} down
-	hciconfig ${BT_DEVICE} up; hciconfig ${BT_DEVICE} up
 }
 
 main "$@"

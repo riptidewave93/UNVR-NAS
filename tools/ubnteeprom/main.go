@@ -10,6 +10,86 @@ import (
 	"strings"
 )
 
+// Type for device map
+type UBNTSysMap struct {
+	name, shortname, cpu, sysid string
+}
+
+var UBNTDeviceMap = []UBNTSysMap{
+	{
+		name:      "Unifi-NVR-PRO",
+		shortname: "UNVRPRO",
+		cpu:       "AL324V2",
+		sysid:     "ea20",
+	},
+	{
+		name:      "UniFi-NVR-4",
+		shortname: "UNVR4",
+		cpu:       "AL324V2",
+		sysid:     "ea16",
+	},
+	{
+		name:      "UniFi-NVR-4",
+		shortname: "UNVR4",
+		cpu:       "AL324V2",
+		sysid:     "ea1a",
+	},
+}
+
+type UBNT_Return_Values struct {
+	name, value string
+}
+
+// Store our board vars
+var UBNT_Board_Vars = []string{
+	"format",
+	"version",
+	"boardid",
+	"vendorid",
+	"bomrev",
+	"hwaddrbbase",
+	"EthMACAddrCount",
+	"WiFiMACAddrCount",
+	"BtMACAddrCount",
+	"regdmn[0]",
+	"regdmn[1]",
+	"regdmn[2]",
+	"regdmn[3]",
+	"regdmn[4]",
+	"regdmn[5]",
+	"regdmn[6]",
+	"regdmn[7]",
+}
+
+// Store our systeminfo vars
+var UBNT_SystemInfo_Vars = []string{
+	// "cpu",
+	// "cpuid",
+	// "flashSize",
+	// "ramsize",
+	"vendorid",
+	"systemid",
+	// "shortname",
+	"boardrevision",
+	"serialno",
+	// "manufid",
+	// "mfgweek",
+	// "qrid",
+	// eth*.macaddr (generated mac's for all eth interfaces)
+	// "device.hashid",
+	// "device.anonid",
+	// "bt0.macaddr",
+	"regdmn[]",
+	// "cpu_rev_id",
+}
+
+// Store our ubnt-tools id vars
+var UBNT_Tools_vars = []string{
+	"board.sysid",
+	"board.serialno",
+	"board.bom",
+}
+
 // Type for EEPROM structure
 type EEPROM_Value struct {
 	name, description, vtype string
@@ -17,7 +97,8 @@ type EEPROM_Value struct {
 }
 
 // Build our BOARD eeprom structure
-var BOARD = []EEPROM_Value{
+var EEPROM = []EEPROM_Value{
+	// START BOARD DATA
 	{
 		name:        "format",
 		description: "EEPROM Format",
@@ -137,11 +218,8 @@ var BOARD = []EEPROM_Value{
 		length:      0x2,
 		vtype:       "hex",
 	},
-}
-
-// Build our SYSTEM_INFO eeprom structure
-var SYSTEM_INFO = []EEPROM_Value{
-	// Missing values:
+	// END BOARD DATA
+	// START SYSTEM INFO
 	// cpu
 	// cpuid
 	// flashSize (this is static in unifi's kernel module -_-)
@@ -172,7 +250,7 @@ var SYSTEM_INFO = []EEPROM_Value{
 		name:        "serialno",
 		description: "Serial Number",
 		offset:      0x0,
-		length:      0x5,
+		length:      0x6,
 		vtype:       "hex",
 	},
 	// manufid
@@ -190,10 +268,8 @@ var SYSTEM_INFO = []EEPROM_Value{
 		vtype:       "hex",
 	},
 	// cpu_rev_id
-}
-
-// Build our vars that are similar to running ubnt-tools id
-var UBNT_TOOLS = []EEPROM_Value{
+	// END SYSTEM INFO
+	// START UBNT TOOLS ID
 	{
 		name:        "board.sysid",
 		description: "Device Model/Revision Identifier",
@@ -201,13 +277,13 @@ var UBNT_TOOLS = []EEPROM_Value{
 		length:      0x2,
 		vtype:       "hex",
 	},
-	{
-		name:        "board.serialno",
-		description: "Serial Number",
-		offset:      0x0,
-		length:      0x5,
-		vtype:       "hex",
-	},
+	// board.name (handled by UBNTDeviceMap)
+	// board.shortname (handled by UBNTDeviceMap)
+	// board.subtype
+	// board.reboot # Time (s)
+	// board.upgrade # Time (s)
+	// board.cpu.id
+	// board.uuid
 	{
 		name:        "board.bom",
 		description: "Board Bill of Materials Revision Code",
@@ -215,6 +291,16 @@ var UBNT_TOOLS = []EEPROM_Value{
 		length:      0xC,
 		vtype:       "str",
 	},
+	// board.hwrev
+	{
+		name:        "board.serialno",
+		description: "Serial Number",
+		offset:      0x0,
+		length:      0x6,
+		vtype:       "hex",
+	},
+	// board.qrid
+	// END UBNT TOOLS ID
 }
 
 func check(e error) {
@@ -291,20 +377,65 @@ func eeprom_read(vl []EEPROM_Value, f *os.File, key string) string {
 	}
 }
 
-func return_values(values []EEPROM_Value, file string, filter string) {
+func return_values(rtype string, file string, filter string) {
+	var okeys []string
+	var ourboard UBNTSysMap
+	var ret_data []UBNT_Return_Values
+
 	// Open EEPROM for read only
 	f, err := os.Open(file)
 	defer f.Close()
 	check(err)
 
-	// If select is set, select our item, else return all
+	// Start with our sysid for extra vars, pull it out of our list
+	board_sysid := eeprom_read(EEPROM, f, "systemid")
+	for _, board := range UBNTDeviceMap {
+		if board.sysid == board_sysid {
+			ourboard = board
+			break
+		}
+	}
+
+	// did we find our device?
+	if ourboard.name == "" {
+		fmt.Printf("Error: Unknown board sysid of %s! This device is not yet supported.\n", board_sysid)
+		os.Exit(1)
+	}
+
+	// Load in the right list of keys to itterate over, add static keys if we got em
+	if rtype == "board" {
+		okeys = UBNT_Board_Vars
+	} else if rtype == "system" {
+		okeys = UBNT_SystemInfo_Vars
+		ret_data = append(ret_data, UBNT_Return_Values{name: "cpu", value: ourboard.cpu})
+		ret_data = append(ret_data, UBNT_Return_Values{name: "shortname", value: ourboard.shortname})
+	} else if rtype == "tools" {
+		okeys = UBNT_Tools_vars
+		ret_data = append(ret_data, UBNT_Return_Values{name: "board.name", value: ourboard.name})
+		ret_data = append(ret_data, UBNT_Return_Values{name: "board.shortname", value: ourboard.shortname})
+	}
+
+	// Populate our eeprom data for the rest of the data
+	for _, v := range okeys {
+		ret_data = append(ret_data, UBNT_Return_Values{name: v, value: eeprom_read(EEPROM, f, v)})
+	}
+
+	// Do we have a filter? if so select and return single item
 	if len(filter) > 0 {
-		// Read value
-		fmt.Printf("%s\n", eeprom_read(values, f, filter))
+		// Does our filter item exist in our ret object?
+		for _, v := range ret_data {
+			if v.name == filter {
+				fmt.Printf("%s\n", v.value)
+				return
+			}
+		}
+		// If we are here, our key didn't exist
+		fmt.Printf("Error: Invalid key %s!\n", filter)
+		os.Exit(1)
 	} else {
-		// read all
-		for _, v := range values {
-			fmt.Printf("%s=%s\n", v.name, eeprom_read(values, f, v.name))
+		// Return all items because we have no filter
+		for _, v := range ret_data {
+			fmt.Printf("%s=%s\n", v.name, v.value)
 		}
 	}
 }
@@ -326,11 +457,11 @@ func main() {
 
 	// Is board set?
 	if *argboard {
-		return_values(BOARD, *argfile, *argfilter)
+		return_values("board", *argfile, *argfilter)
 	} else if *argsystem {
-		return_values(SYSTEM_INFO, *argfile, *argfilter)
+		return_values("system", *argfile, *argfilter)
 	} else if *argtools {
-		return_values(UBNT_TOOLS, *argfile, *argfilter)
+		return_values("tools", *argfile, *argfilter)
 	} else {
 		// Tell user noting was submitted
 		fmt.Fprintf(os.Stderr, "Error Invalid usage of %s:\n", os.Args[0])
