@@ -21,8 +21,8 @@ genimage                         \
 	--inputpath "${build_path}/final"  \
 	--outputpath "${build_path}/final" \
 	--config "${build_path}/genimage.cfg"
-mv ${build_path}/final/emmc.img ${build_path}/final/debian-UNVRPRO.img
-gzip ${build_path}/final/debian-UNVRPRO.img
+mv ${build_path}/final/emmc.img ${build_path}/final/debian-${BOARD}.img
+gzip ${build_path}/final/debian-${BOARD}.img
 rm -rf /tmp/genimage-initial-tmppath # Cleanup
 
 # Cleanup

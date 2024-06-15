@@ -67,7 +67,7 @@ sudo rm -f ${build_path}/rootfs/placeholder ${build_path}/rootfs/boot/placeholde
 # SAFETY NET - trap it, even tho we have makefile with set -e
 debug_msg "Docker: debootstraping..."
 trap "sudo umount ${build_path}/rootfs/boot; sudo umount ${build_path}/rootfs; sudo losetup -d ${boot_loop_dev}; sudo losetup -d ${rootfs_loop_dev}" SIGINT SIGTERM
-docker run --ulimit nofile=1024 --rm --privileged --cap-add=ALL -v /dev:/dev -v "${root_path}:/repo:Z" -it ${docker_tag} /repo/scripts/docker/run_debootstrap.sh
+docker run --ulimit nofile=1024 --rm --privileged --cap-add=ALL -v /dev:/dev -v "${root_path}:/repo:Z" -e BOARD="${BOARD}" -it ${docker_tag} /repo/scripts/docker/run_debootstrap.sh
 
 debug_msg "Note: You might be asked for your password for losetup and umount since we are cleaning up mounts..."
 debug_msg "Cleaning up..."

@@ -14,7 +14,7 @@ fi
 mkdir -p ${build_path}/final
 
 # Kick off the docker to do the magics for us, since we need genimage
-docker run --rm -v "${root_path}:/repo:Z" -it ${docker_tag} /repo/scripts/docker/run_mkimage_final.sh
+docker run --rm -v "${root_path}:/repo:Z" -e BOARD="${BOARD}" -it ${docker_tag} /repo/scripts/docker/run_mkimage_final.sh
 
 # Just create our final dir and move bits over
 TIMESTAMP=`date +%Y%m%d-%H%M`
