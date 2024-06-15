@@ -26,7 +26,7 @@ var UBNTDeviceMap = []UBNTSysMap{
 		name:      "UniFi-NVR-4",
 		shortname: "UNVR4",
 		cpu:       "AL324V2",
-		sysid:     "ea16",
+		sysid:     "ea16", // USB drive (non emmc) variant
 	},
 	{
 		name:      "UniFi-NVR-4",

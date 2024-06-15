@@ -6,9 +6,17 @@ build_path="${root_path}/BuildEnv"
 # Docker image name
 docker_tag=unvr-nas:builder
 
-# Expected UNVR Firmware and hash
-firmware_filename="f449-UNVRPRO-4.0.3-fdec2c4f-1855-4eb6-8711-e22f8f904922.bin"
-firmware_md5="5dcdc03bdec1524767007fcd12e81777"
+# Expected UNVR Firmware(s) and hash(s)
+UNVR_firmware_filename="7f7c-UNVR-4.0.5-1d4b9c7d-926b-4ef4-88c6-23978c2455a8.bin"
+UNVR_firmware_md5="3bab9336619125e7fe6e4af7484a79dc"
+UNVRPRO_firmware_filename="b0a3-UNVRPRO-4.0.5-f221e29e-3405-4cb9-8d13-0f117d9cc3a1.bin"
+UNVRPRO_firmware_md5="f6aec555fa79c4e083168ec2aac4a71a"
+
+# Render our board out
+fwfnvar="${BOARD}_firmware_filename"
+firmware_filename="${!fwfnvar}"
+fwmd5var="${BOARD}_firmware_md5"
+firmware_md5="${!fwmd5var}"
 
 # Toolchain
 toolchain_url="https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"

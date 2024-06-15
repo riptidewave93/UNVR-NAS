@@ -69,6 +69,7 @@ jq --null-input --compact-output \
     omv-confdbadm update "conf.system.network.interface" -
 # Set hostname
 omv-confdbadm update "conf.system.network.dns" "{\"hostname\": \"unvr-nas\"}"
+sed -i "s|myhostname = .*|myhostname = unvr-nas|g" /etc/postfix/main.cf
 
 # Cleanup stuff we don't want floating around
 apt-get autoclean || true

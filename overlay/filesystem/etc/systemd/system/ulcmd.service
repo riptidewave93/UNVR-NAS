@@ -1,11 +1,11 @@
 [Unit]
-Description=Daemon for MCU based LCM control
+Description=Unifi LED/ULCMD contoller
 Requires=ubnt-init.service
 Requires=mock-ubnt-api.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/ulcmd
+ExecStart=/usr/lib/init/boot/ubnt-ulcmd.sh
 KillMode=process
 Restart=on-failure
 RestartSec=2s

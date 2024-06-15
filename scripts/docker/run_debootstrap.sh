@@ -14,15 +14,15 @@ export DEBIAN_FRONTEND=noninteractive
 export DEBCONF_NONINTERACTIVE_SEEN=true
 
 # CD into our rootfs mount, and starts the fun!
-cd ${build_path}/rootfs
-debootstrap --no-check-gpg --foreign --arch=${deb_arch} --include=apt-transport-https ${deb_release} ${build_path}/rootfs ${deb_mirror}
+cd "${build_path}/rootfs"
+debootstrap --no-check-gpg --foreign --arch=${deb_arch} --include=apt-transport-https ${deb_release} "${build_path}/rootfs" ${deb_mirror}
 cp /usr/bin/qemu-aarch64-static usr/bin/
-chroot ${build_path}/rootfs /debootstrap/debootstrap --second-stage
+chroot "${build_path}/rootfs" /debootstrap/debootstrap --second-stage
 
 # Copy over our kernel modules and kernel from the FS image
 # Note that in the future, we wanna use our own kernel, but the current GPL is way too old!!!!!
-mv -f "${build_path}/fw-extract/rootfs/lib/modules" "${build_path}/rootfs/lib"
-cp "${build_path}/fw-extract/kernel.bin" "${build_path}/rootfs/boot/uImage"
+mv -f "${build_path}/fw-extract/${BOARD}-rootfs/lib/modules" "${build_path}/rootfs/lib"
+cp "${build_path}/fw-extract/${firmware_filename%.bin}/kernel.bin" "${build_path}/rootfs/boot/uImage"
 
 # Now, for the old kernel we built, pull in btrfs + depends modules (we do depmod in bootstrap)
 cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/lib/zstd/zstd_compress.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
@@ -34,31 +34,32 @@ if [[ -d ${root_path}/overlay/${fs_overlay_dir}/ ]]; then
 	cp -R ${root_path}/overlay/${fs_overlay_dir}/* ./
 fi
 
-# Apply our part UUIDs to fstab
-#sed -i "s|BOOTUUIDPLACEHOLDER|$(blkid -o value -s UUID ${build_path}/boot.ext4)|g" ${build_path}/rootfs/etc/fstab
-#sed -i "s|ROOTUUIDPLACEHOLDER|$(blkid -o value -s UUID ${build_path}/rootfs.ext4)|g" ${build_path}/rootfs/etc/fstab
-
 # Hostname
-echo "${distrib_name}" > ${build_path}/rootfs/etc/hostname
-echo "127.0.1.1	${distrib_name}" >> ${build_path}/rootfs/etc/hosts
+echo "unvr-nas" > "${build_path}/rootfs/etc/hostname"
+echo "127.0.1.1	unvr-nas" >> "${build_path}/rootfs/etc/hosts"
 
 # Console settings
 echo "console-common	console-data/keymap/policy	select	Select keymap from full list
 console-common	console-data/keymap/full	select	us
-" > ${build_path}/rootfs/debconf.set
+" > "${build_path}/rootfs/debconf.set"
 
-# Copy over stuff for ulcmd, this is hacky, but that's this ENTIRE repo for you
-mv "${build_path}/fw-extract/rootfs/usr/bin/ulcmd" "${build_path}/rootfs/usr/bin/ulcmd" # LCD controller
-mv "${build_path}/fw-extract/rootfs/usr/share/firmware" "${build_path}/rootfs/usr/share/" # LCD panel firmwares
-mkdir -p "${build_path}/rootfs/usr/lib/ubnt-fw/" # Home for ulcmd libraries
-for file in libgrpc++.so.1 libgrpc.so.10 libprotobuf.so.23 \
-	libssl.so.1.1 libcrypto.so.1.1 libabsl*.so.20200923 libatomic.so.1; do
-	cp -H ${build_path}/fw-extract/rootfs/usr/lib/aarch64-linux-gnu/${file} "${build_path}/rootfs/usr/lib/ubnt-fw/"
-done
+# Copy over stuff for ulcmd on UNVRPRO. this is hacky, but that's this ENTIRE repo for you
+if [ "${BOARD}" == "UNVRPRO" ]; then
+	mv "${build_path}/fw-extract/${BOARD}-rootfs/usr/bin/ulcmd" "${build_path}/rootfs/usr/bin/ulcmd" # LCD controller
+	mv "${build_path}/fw-extract/${BOARD}-rootfs/usr/share/firmware" "${build_path}/rootfs/usr/share/" # LCD panel firmwares
+	mkdir -p "${build_path}/rootfs/usr/lib/ubnt-fw/" # Home for ulcmd libraries
+	for file in libgrpc++.so.1 libgrpc.so.10 libprotobuf.so.23 \
+		libssl.so.1.1 libcrypto.so.1.1 libabsl*.so.20200923 libatomic.so.1; do
+		cp -H ${build_path}/fw-extract/${BOARD}-rootfs/usr/lib/aarch64-linux-gnu/${file} "${build_path}/rootfs/usr/lib/ubnt-fw/"
+	done
+else
+	# Remove our ld.so.conf.d as it's not needed for UVNR
+	rm "${build_path}/rootfs/etc/ld.so.conf.d/ubnt.conf"
+fi
 
 # Copy over bluetooth firmware files
 mkdir -p "${build_path}/rootfs/lib/firmware"
-cp -R "${build_path}/fw-extract/rootfs/lib/firmware/csr8x11" "${build_path}/rootfs/lib/firmware/" # LCD panel firmwares
+cp -R "${build_path}/fw-extract/${BOARD}-rootfs/lib/firmware/csr8x11" "${build_path}/rootfs/lib/firmware/" # LCD panel firmwares
 
 # Install our bccmd we compiled (less we use from unifi the better)
 cp -R "${build_path}/packages/bluez/bccmd" "${build_path}/rootfs/usr/bin"
@@ -69,9 +70,9 @@ cp -R "${build_path}/packages/ubnteeprom/ubnteeprom" "${build_path}/rootfs/usr/b
 chmod +x "${build_path}/rootfs/usr/bin/ubnteeprom"
 
 # Kick off bash setup script within chroot
-cp ${docker_scripts_path}/bootstrap/001-bootstrap ${build_path}/rootfs/bootstrap
-chroot ${build_path}/rootfs /bootstrap
-rm ${build_path}/rootfs/bootstrap
+cp "${docker_scripts_path}/bootstrap/001-bootstrap" "${build_path}/rootfs/bootstrap"
+chroot "${build_path}/rootfs" /bootstrap
+rm "${build_path}/rootfs/bootstrap"
 
 # Final cleanup
-rm ${build_path}/rootfs/usr/bin/qemu-aarch64-static
+rm "${build_path}/rootfs/usr/bin/qemu-aarch64-static"
