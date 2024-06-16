@@ -60,8 +60,18 @@ if [ "${BOARD}" == "UNVRPRO" ]; then
 	# Now for the REAL JANK! patch ulcmd so it doesn't rely on /proc/ubnthal, so we can use our userspace tool ubnteeprom
 	sed -i 's|/proc/ubnthal/system.info|/tmp/.ubnthal_system_info|g' "${build_path}/rootfs/usr/bin/ulcmd"
 else
-	# Remove our ld.so.conf.d as it's not needed for UVNR
-	rm "${build_path}/rootfs/etc/ld.so.conf.d/ubnt.conf"
+	# Remove UNVRPRO specific files/services
+	rm "${build_path}/rootfs/etc/ld.so.conf.d/ubnt.conf" \
+		"${build_path}/rootfs/etc/systemd/system/mock-ubnt-api.service" \
+		"${build_path}/rootfs/etc/systemd/system/ulcmd.service" \
+		"${build_path}/rootfs/etc/systemd/system/ulcmd-reboot-hook.service" \
+		"${build_path}/rootfs/etc/systemd/system/ulcmd-shutdown-hook.service" \
+		"${build_path}/rootfs/usr/bin/mock-ubnt-api" \
+		"${build_path}/rootfs/usr/bin/ubnt-systool" \
+		"${build_path}/rootfs/usr/bin/ubnt-tools" \
+		"${build_path}/rootfs/usr/bin/ustorage" \
+		"${build_path}/rootfs/usr/lib/init/boot/ubnt-ulcmd.sh" \
+		"${build_path}/rootfs/usr/lib/python3/dist-packages/ubnthelpers.py"
 fi
 
 # Copy over bluetooth firmware files

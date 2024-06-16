@@ -20,11 +20,15 @@ apt-mark hold linux-image-* # We do not want these, as we run our own kernel!
 
 # Setup our services
 systemctl enable ubnt-init
-systemctl enable mock-ubnt-api
-systemctl enable ulcmd
-systemctl enable ulcmd-reboot-hook
-systemctl enable ulcmd-shutdown-hook
 systemctl enable unvr-fan-daemon
+
+# Do we have ulcmd? if so, we are UNVRPRO so enable ulcmd services
+if [ -f "/usr/bin/ulcmd" ]; then
+    systemctl enable mock-ubnt-api
+    systemctl enable ulcmd
+    systemctl enable ulcmd-reboot-hook
+    systemctl enable ulcmd-shutdown-hook
+fi
 
 # Now that we have our wanted kernel in place, do the rest of our installs
 apt-get -o Dpkg::Options::="--force-confold" -y --allow-downgrades \
@@ -67,9 +71,9 @@ jq --null-input --compact-output \
 jq --null-input --compact-output \
     "{uuid: \"fa4b1c66-ef79-11e5-87a0-0002b3a176b4\", devicename: \"enp0s2\", method: \"dhcp\", method6: \"auto\"}" | \
     omv-confdbadm update "conf.system.network.interface" -
+
 # Set hostname
 omv-confdbadm update "conf.system.network.dns" "{\"hostname\": \"unvr-nas\"}"
-sed -i "s|myhostname = .*|myhostname = unvr-nas|g" /etc/postfix/main.cf
 
 # Cleanup stuff we don't want floating around
 apt-get autoclean || true
