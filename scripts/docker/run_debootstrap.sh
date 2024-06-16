@@ -24,9 +24,10 @@ chroot "${build_path}/rootfs" /debootstrap/debootstrap --second-stage
 mv -f "${build_path}/fw-extract/${BOARD}-rootfs/lib/modules" "${build_path}/rootfs/lib"
 cp "${build_path}/fw-extract/${firmware_filename%.bin}/kernel.bin" "${build_path}/rootfs/boot/uImage"
 
-# Now, for the old kernel we built, pull in btrfs + depends modules (we do depmod in bootstrap)
+# Now, for the old kernel we built, pull in our extra modules we need! (depmod is done in bootstrap)
 cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/lib/zstd/zstd_compress.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
 cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/fs/btrfs/btrfs.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
+cp "${build_path}/kernel/ubnt-mtd-lock.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
 
 # Copy over our overlay if we have one
 if [[ -d ${root_path}/overlay/${fs_overlay_dir}/ ]]; then
@@ -52,6 +53,8 @@ if [ "${BOARD}" == "UNVRPRO" ]; then
 		libssl.so.1.1 libcrypto.so.1.1 libabsl*.so.20200923 libatomic.so.1; do
 		cp -H ${build_path}/fw-extract/${BOARD}-rootfs/usr/lib/aarch64-linux-gnu/${file} "${build_path}/rootfs/usr/lib/ubnt-fw/"
 	done
+	# Now for the REAL JANK! patch ulcmd so it doesn't rely on /proc/ubnthal, so we can use our userspace tool ubnteeprom
+	sed -i 's|/proc/ubnthal/system.info|/tmp/.ubnthal_system_info|g' "${build_path}/rootfs/usr/bin/ulcmd"
 else
 	# Remove our ld.so.conf.d as it's not needed for UVNR
 	rm "${build_path}/rootfs/etc/ld.so.conf.d/ubnt.conf"

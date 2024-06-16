@@ -6,10 +6,10 @@ scripts_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
 # Make our temp builddir outside of the world of mounts for SPEEDS
 kernel_builddir=$(mktemp -d)
-tar -xzf ${root_path}/downloads/${kernel_filename} -C ${kernel_builddir}
+tar -xzf "${root_path}/downloads/${kernel_filename}" -C ${kernel_builddir}
 
 # Exports baby
-export PATH=${build_path}/toolchain/${toolchain_bin_path}:${PATH}
+export PATH="${build_path}/toolchain/${toolchain_bin_path}":${PATH}
 export GCC_COLORS=auto
 export CROSS_COMPILE=${toolchain_cross_compile}
 export ARCH=arm64
@@ -18,7 +18,7 @@ export ARCH=arm64
 cd ${kernel_builddir}/${kernel_filename%.tar.gz}
 
 # If we have patches, apply them
-if [[ -d ${root_path}/patches/kernel/ ]]; then
+if [[ -d "${root_path}/patches/kernel/" ]]; then
     for file in ${root_path}/patches/kernel/*.patch; do
         echo "Applying kernel patch ${file}"
         patch -p1 < ${file}
@@ -26,7 +26,7 @@ if [[ -d ${root_path}/patches/kernel/ ]]; then
 fi
 
 # Apply overlay if it exists
-if [[ -d ${root_path}/overlay/${kernel_overlay_dir}/ ]]; then
+if [[ -d "${root_path}/overlay/${kernel_overlay_dir}/" ]]; then
     echo "Applying ${kernel_overlay_dir} overlay"
     cp -R ${root_path}/overlay/${kernel_overlay_dir}/* ./
 fi
@@ -52,3 +52,10 @@ mv defconfig ${build_path}/kernel/kernel_config
 #cp ./arch/arm64/boot/Image.gz ${build_path}/kernel
 #mv uImage ${build_path}/kernel
 mv ./modules-dir ${build_path}/kernel/kernel-modules
+
+# Now that the kernel is done, build our out of tree modules! :)
+module_builddir=$(mktemp -d)
+cp ${root_path}/tools/mtd-lock/* "${module_builddir}"
+cd "${module_builddir}"
+make -C ${kernel_builddir}/${kernel_filename%.tar.gz} M=$PWD
+cp "${module_builddir}/ubnt-mtd-lock.ko" ${build_path}/kernel

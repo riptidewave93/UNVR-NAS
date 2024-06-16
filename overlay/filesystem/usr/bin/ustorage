@@ -125,12 +125,22 @@ class UNVRDiskInfo:
 
     def __parse_disk_temp(self):
         try:
-            return int(
-                self.__parse_smartctl(
-                    self.__smartctl_output,
-                    r"^194 [\w-]+\s+0x\d+\s+\d+\s+\d+\s+\d+\s+[\w-]+\s+\w+\s+\S+\s+(\d+)(?:\s[\(][^)]*[\)])?$",
+            try:
+                # First try the expected 194
+                return int(
+                    self.__parse_smartctl(
+                        self.__smartctl_output,
+                        r"^194 [\w-]+\s+0x\d+\s+\d+\s+\d+\s+\d+\s+[\w-]+\s+\w+\s+\S+\s+(\d+)(?:\s[\(][^)]*[\)])?$",
+                    )
                 )
-            )
+            except:
+                # Some other SSDs (cough, samsung) use 190 for airflow temp -_-
+                return int(
+                    self.__parse_smartctl(
+                        self.__smartctl_output,
+                        r"^190 [\w-]+\s+0x\d+\s+\d+\s+\d+\s+\d+\s+[\w-]+\s+\w+\s+\S+\s+(\d+)(?:\s[\(][^)]*[\)])?$",
+                    )
+                )
         except:
             return None
 

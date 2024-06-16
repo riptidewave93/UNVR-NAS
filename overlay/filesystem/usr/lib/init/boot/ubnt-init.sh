@@ -3,7 +3,8 @@
 case "$1" in
     start)
         # Load our kernel modules
-        /usr/sbin/modprobe ubnthal
+        # /usr/sbin/modprobe ubnthal # No longer needed, ubnteeprom replaced it in userspace
+        /usr/sbin/modprobe ubnt-mtd-lock # Force our /dev/mtd* as RO
         /usr/sbin/modprobe btrfs
 
         # Set our kernel panic timeout SUPER short so we reboot on crash

@@ -2,19 +2,25 @@
 
 Firmware builder to convert your Unifi NVR/Unifi NVR Pro into an OpenMediaVault NAS appliance.
 
-**This repo is still under heavy development and should be considered early alpha!**
+**This repo is still under heavy development and should be considered alpha!**
 
 ## Supported Devices
 
 * UNVR **(Currently Untested!)**
 * UNVR Pro
 
+## Disclaimer
+
+Note that since prebuilt Ubiquiti software is currently required for this firmware, this repo doesn't have prebuilt images available. This is to prevent redistribution of Ubiquiti's IP, so please DO NOT ASK! Also, by using this repo you accept all risk associated with it including but not limited to voiding your warranty and releasing all parties from any liability associated with your device and this software. PROCEED AT YOUR OWN RISK!
+
 ## Usage
 
 1. Download the required UNVR firmware for your device, and place it in the unifi-firmware directory. Please see the README.md in that directory for more information.
-2. Make sure your system has the required packages installed for this repo, which are:
+2. Make sure your linux system has the required packages installed for this repo, which are:
 
     `docker-ce losetup wget sudo make qemu-user-static squashfs-tools`
+
+    Note that building from OSX/Windows is not supported. A Linux host is **REQUIRED**.
 
 3. Run make with your board name set, and sit back and wait for the firmware image to build. Depending on your computer, this may take around an hour or so.
 
@@ -139,7 +145,3 @@ To restore back to the factory UNVR/UNVR Pro firmware, you can do the following 
     * Need to simplify the install process, this should be much easier once I can get latest GPL kernel source (no more uboot env stuff)
 * Reset Button
     * Only works to reboot the system, may wire this up to reset the WebUI password in OpenMediaVault down the road
-
-## Disclaimer
-
-Note that since prebuild Ubiquiti software is required for this tool to work, this repo will never have prebuilt images available. This is to prevent redistribution of Ubiquiti's IP, so please DO NOT ASK! Also, by using this repo you accept all risk associated with it including but not limited to voiding your warranty and releasing all parties from any liability associated with your device and this software.

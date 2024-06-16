@@ -1,5 +1,8 @@
 package main
 
+// Copyright (C) 2024 Chris Blake <chrisrblake93@gmail.com>
+// Licensed under the GNU Public License, version 2
+
 import (
 	"encoding/hex"
 	"flag"
