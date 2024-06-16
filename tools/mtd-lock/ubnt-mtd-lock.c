@@ -53,8 +53,8 @@ int ubnt_mtd_lock_init(void)
 {
 	int i, err;
 
-    /* For all MTD partitions, go RO. Assume <10 for UNVR/UNVRPRO */
-	for (i = 0; i < 10; ++i) {
+    /* For all MTD partitions, go RO. Assume <15 for UNVR/UNVRPRO, as UNVR OG has 10 */
+	for (i = 0; i < 15; ++i) {
 		err = set_readonly(i);
 		if (err == -ENODEV) {
 			break;
