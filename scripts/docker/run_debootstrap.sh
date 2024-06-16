@@ -24,6 +24,10 @@ chroot "${build_path}/rootfs" /debootstrap/debootstrap --second-stage
 mv -f "${build_path}/fw-extract/${BOARD}-rootfs/lib/modules" "${build_path}/rootfs/lib"
 cp "${build_path}/fw-extract/${firmware_filename%.bin}/kernel.bin" "${build_path}/rootfs/boot/uImage"
 
+# We can burn ubnt's proprietary modules, so we don't bundle in this IP!
+rm "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/ubnt_common.ko" \
+	"${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/ubnthal.ko"
+
 # Now, for the old kernel we built, pull in our extra modules we need! (depmod is done in bootstrap)
 cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/lib/zstd/zstd_compress.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
 cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/fs/btrfs/btrfs.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
