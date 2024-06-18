@@ -1,5 +1,5 @@
 [Unit]
-Description=Fan Controller daemon for the UNVR Pro
+Description=Fan Controller daemon for the UNVR/UNVRPRO
 Requires=ubnt-init.service
 
 [Service]

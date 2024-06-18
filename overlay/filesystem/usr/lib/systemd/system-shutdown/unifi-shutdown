@@ -1,16 +1,12 @@
 #!/bin/bash
 
-# turn off fans for shutdown
-if [ -d "/sys/class/hwmon/hwmon0/device" ]; then
-	for pwm in `ls /sys/class/hwmon/hwmon0/device/pwm[0-6]`; do
-		echo 0 > ${pwm}
-	done
-fi
-
 # Ensure all mounts in /srv from OMV are cleaned up
 for dir in `ls /srv | grep dev-disk`; do
 	umount -q /srv/${dir};
 done
+
+# Give it a sec...
+sleep 1
 
 # Now for all disks, delete from bus
 for dsk in sd{a..z}; do
@@ -25,5 +21,18 @@ if [ -d "/sys/bus/platform/drivers/ui-hdd-pwrctl-v2" ]; then
 		echo ${bay} > "$(realpath /sys/bus/platform/drivers/ui-hdd-pwrctl-v2/*hdd_pwrctl-v2)/hdd_force_poweroff"
 	done
 fi
+
 # Let the disks spool down a sec...
 sleep 2
+
+# turn off fans for shutdown
+if [ -d "/sys/class/hwmon/hwmon0/device" ]; then
+	for pwm in `ls /sys/class/hwmon/hwmon0/device/pwm[0-6]`; do
+		echo 0 > "${pwm}"
+	done
+elif [ -f "/sys/class/hwmon/hwmon0/pwm1" ]; then
+	# Different hwmon devices may have this path instead
+	for pwm in `ls /sys/class/hwmon/hwmon0/pwm[0-6]`; do
+		echo 0 > "${pwm}"
+	done
+fi

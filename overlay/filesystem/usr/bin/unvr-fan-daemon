@@ -21,8 +21,20 @@ THERMAL_SYS_PATHS = {
             "/sys/class/hwmon/hwmon0/device/pwm3",
         ],
     },
+    "UNVR4": {
+        "thermal": [
+            "/sys/devices/virtual/thermal/thermal_zone0/temp",
+            "/sys/class/hwmon/hwmon0/device/temp1_input",
+            "/sys/class/hwmon/hwmon0/device/temp2_input",
+            "/sys/class/hwmon/hwmon0/device/temp3_input",
+        ],
+        "fan_pwms": [
+            "/sys/class/hwmon/hwmon0/device/pwm1",
+            "/sys/class/hwmon/hwmon0/device/pwm2",
+            "/sys/class/hwmon/hwmon0/device/pwm3",
+        ],
+    },
 }
-
 
 def __get_board_temps():
     # Are we supported?
@@ -37,8 +49,16 @@ def __get_board_temps():
             with open(path, "r") as f:
                 board_temps.append(int(f.readline().rstrip("\n")))
         except FileNotFoundError:
-            print(f"Warning: Unable to open {path}; ignoring and continuing...")
-            continue
+            # If we are here, either it doesn't exist, OR, we need to change paths from 
+            # /sys/class/hwmon/hwmon0/device/temp*_input to /sys/class/hwmon/hwmon0/temp*_input 
+            # since there could be a different thermal sensor/controller being used on the board
+            try:
+                with open(path.replace('/device',''), "r") as f:
+                    board_temps.append(int(f.readline().rstrip("\n")))
+            except FileNotFoundError:
+                print(f"Warning: Unable to open {path}; ignoring and continuing...")
+                continue
+
 
     # Did we get ANY temps?!?
     if len(board_temps) == 0:
@@ -100,10 +120,17 @@ def __set_fan_speed(speed: int):
             with open(fan, "w") as f:
                 f.write(str(speed))
         except FileNotFoundError:
-            print(
-                f"Error: Unable to write to PWM at {fan}! Why can't we set fan speed!?"
-            )
-            raise
+            # If we are here, either it doesn't exist, OR, we need to change paths from 
+            # /sys/class/hwmon/hwmon0/device/pwm* to /sys/class/hwmon/hwmon0/pwm* since
+            # there could be a different thermal sensor/controller being used on the board
+            try:
+                with open(fan.replace('/device',''), "w") as f:
+                    f.write(str(speed))
+            except FileNotFoundError:
+                print(
+                    f"Error: Unable to write to PWM at {fan}! Why can't we set fan speed!?"
+                )
+                raise
 
 
 def __write_out_temp(temp: int, path: str = "/tmp/.unvr_temp"):
