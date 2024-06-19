@@ -14,6 +14,10 @@ if [ ! -d ${build_path}/toolchain ]; then
     tar -xf ${root_path}/downloads/${toolchain_filename} -C ${build_path}/toolchain
 fi
 
+# Do our firmware extraction
+debug_msg "Docker: Extracting Firmware..."
+docker run --ulimit nofile=1024 --rm -v "${root_path}:/repo:Z" -e BOARD="${BOARD}" -it ${docker_tag} /repo/scripts/docker/extract_firmware.sh
+
 if [ ! -d ${build_path}/kernel ]; then
     debug_msg "Docker: Building Kernel..."
     docker run --ulimit nofile=1024 --rm -v "${root_path}:/repo:Z" -it ${docker_tag} /repo/scripts/docker/build_kernel.sh

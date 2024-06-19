@@ -45,6 +45,7 @@ RUN apt-get update && apt-get install -yq \
     qemu-utils \
     qemu-user-static \
     rsync \
+    squashfs-tools \
     swig \
     u-boot-tools \
     unzip \

@@ -14,13 +14,6 @@ else
     mkdir ${build_path}
 fi
 
-# Extract the goodies
-${scripts_path}/ubnt-fw-parse.py "${root_path}/unifi-firmware/${firmware_filename}" "${build_path}/fw-extract/${firmware_filename%.bin}"
-
-# Extract the squashfs rootfs
-echo "Extracting unifi rootfs as root..."
-sudo unsquashfs -f -d "${build_path}/fw-extract/${BOARD}-rootfs" "${build_path}/fw-extract/${firmware_filename%.bin}/rootfs.bin"
-
 # Always build to pickup changes/updates/improvements
 debug_msg "Building ${docker_tag}"
 docker build -t ${docker_tag} ${root_path}
