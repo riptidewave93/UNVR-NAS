@@ -21,11 +21,11 @@ apt-mark hold linux-image-* # We do not want these, as we run our own kernel!
 # Setup our services
 systemctl enable ubnt-init
 systemctl enable unvr-fan-daemon
-systemctl enable ulcmd # This runs ubnt-ulcmd.sh!
 
 # Do we have ulcmd? if so, we are UNVRPRO so enable ulcmd services
 if [ -f "/usr/bin/ulcmd" ]; then
     systemctl enable mock-ubnt-api
+    systemctl enable ulcmd
     systemctl enable ulcmd-reboot-hook
     systemctl enable ulcmd-shutdown-hook
 fi

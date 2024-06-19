@@ -1,5 +1,5 @@
 [Unit]
-Description=Unifi LED/ULCMD contoller
+Description=Unifi ULCMD contoller
 Requires=ubnt-init.service
 Requires=mock-ubnt-api.service
 
