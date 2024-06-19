@@ -15,27 +15,30 @@ import (
 
 // Type for device map
 type UBNTSysMap struct {
-	name, shortname, cpu, sysid string
+	name, shortname, sysshortname, cpu, sysid string
 }
 
 var UBNTDeviceMap = []UBNTSysMap{
 	{
-		name:      "Unifi-NVR-PRO",
-		shortname: "UNVRPRO",
-		cpu:       "AL324V2",
-		sysid:     "ea20",
+		name:         "UniFi Network Video Recorder Pro",
+		shortname:    "UNVRPRO",
+		sysshortname: "UNVRPRO",
+		cpu:          "AL324V2",
+		sysid:        "ea20",
 	},
 	{
-		name:      "UniFi-NVR-4",
-		shortname: "UNVR4",
-		cpu:       "AL324V2",
-		sysid:     "ea16", // USB drive (non emmc) variant
+		name:         "UniFi Network Video Recorder",
+		shortname:    "UNVR",
+		sysshortname: "UNVR4",
+		cpu:          "AL324V2",
+		sysid:        "ea16", // USB drive (non emmc) variant
 	},
 	{
-		name:      "UniFi-NVR-4",
-		shortname: "UNVR4",
-		cpu:       "AL324V2",
-		sysid:     "ea1a",
+		name:         "UniFi Network Video Recorder",
+		shortname:    "UNVR",
+		sysshortname: "UNVR4",
+		cpu:          "AL324V2",
+		sysid:        "ea1a",
 	},
 }
 
@@ -411,7 +414,7 @@ func return_values(rtype string, file string, filter string) {
 	} else if rtype == "system" {
 		okeys = UBNT_SystemInfo_Vars
 		ret_data = append(ret_data, UBNT_Return_Values{name: "cpu", value: ourboard.cpu})
-		ret_data = append(ret_data, UBNT_Return_Values{name: "shortname", value: ourboard.shortname})
+		ret_data = append(ret_data, UBNT_Return_Values{name: "shortname", value: ourboard.sysshortname})
 	} else if rtype == "tools" {
 		okeys = UBNT_Tools_vars
 		ret_data = append(ret_data, UBNT_Return_Values{name: "board.name", value: ourboard.name})

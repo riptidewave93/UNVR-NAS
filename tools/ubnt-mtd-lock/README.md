@@ -1,6 +1,6 @@
-# mtd-lock
+# ubnt-mtd-lock
 
-A stupid basic kernel module to ensure we set /dev/mtd as RO (fully) in our firmware. This is done to prevent users/bad actors from wiping your bootloader/Unifi EEPROM, which are required for your device to function!
+A stupid basic kernel module to ensure we set /dev/mtd* as RO (fully) in our firmware. This is done to prevent users/bad actors from wiping your bootloader/Unifi EEPROM, which are required for your device to function!
 
 ## Building
 

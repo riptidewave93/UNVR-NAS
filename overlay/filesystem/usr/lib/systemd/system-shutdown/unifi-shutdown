@@ -36,3 +36,8 @@ elif [ -f "/sys/class/hwmon/hwmon0/pwm1" ]; then
 		echo 0 > "${pwm}"
 	done
 fi
+
+# If UNVR, turn off LED
+if [ -f "/sys/class/leds/ulogo_ctrl/pattern" ]; then
+	echo 0:500 > /sys/class/leds/ulogo_ctrl/pattern
+fi

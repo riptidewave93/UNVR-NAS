@@ -70,8 +70,7 @@ else
 		"${build_path}/rootfs/usr/bin/ubnt-systool" \
 		"${build_path}/rootfs/usr/bin/ubnt-tools" \
 		"${build_path}/rootfs/usr/bin/ustorage" \
-		"${build_path}/rootfs/usr/lib/init/boot/ubnt-ulcmd.sh" \
-		"${build_path}/rootfs/usr/lib/python3/dist-packages/ubnthelpers.py"
+		"${build_path}/rootfs/usr/lib/init/boot/ubnt-ulcmd.sh"
 fi
 
 # Copy over bluetooth firmware files

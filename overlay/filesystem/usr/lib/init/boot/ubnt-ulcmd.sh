@@ -16,7 +16,8 @@ case "$(ubnteeprom -systeminfo -key shortname)" in
         exec ulcmd
         ;;
     "UNVR4")
-        # TODO: LED setup (2=white, 1=blue) against /sys/class/leds/ulogo_ctrl
+        # 2=white, 1=blue, 0=off, needs a value set with :x for ms
+        echo 1:500 > /sys/class/leds/ulogo_ctrl/pattern 
         # Start our "daemon" loop so systemd stays happy
         while true; do
             sleep 3600

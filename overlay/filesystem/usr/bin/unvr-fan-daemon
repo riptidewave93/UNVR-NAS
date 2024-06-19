@@ -3,7 +3,7 @@ import os
 import re
 import time
 
-from ubnthelpers import get_ubnt_shortname
+from functools import lru_cache
 
 SMARTCTL_PATH = "/usr/sbin/smartctl"
 
@@ -35,6 +35,12 @@ THERMAL_SYS_PATHS = {
         ],
     },
 }
+
+
+@lru_cache(None)
+def get_ubnt_shortname() -> str:
+    return os.popen("ubnteeprom -systeminfo -key shortname").read().rstrip("\n")
+
 
 def __get_board_temps():
     # Are we supported?

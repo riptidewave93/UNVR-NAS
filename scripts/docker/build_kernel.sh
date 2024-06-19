@@ -55,7 +55,7 @@ mv ./modules-dir ${build_path}/kernel/kernel-modules
 
 # Now that the kernel is done, build our out of tree modules! :)
 module_builddir=$(mktemp -d)
-cp ${root_path}/tools/mtd-lock/* "${module_builddir}"
+cp ${root_path}/tools/ubnt-mtd-lock/* "${module_builddir}"
 cd "${module_builddir}"
 make -C ${kernel_builddir}/${kernel_filename%.tar.gz} M=$PWD
 cp "${module_builddir}/ubnt-mtd-lock.ko" ${build_path}/kernel
