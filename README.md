@@ -6,7 +6,7 @@ Firmware builder to convert your Unifi NVR/Unifi NVR Pro into an OpenMediaVault 
 
 ## Supported Devices
 
-* UNVR **(Currently Untested!)**
+* UNVR
 * UNVR Pro
 
 ## Disclaimer
