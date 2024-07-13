@@ -5,7 +5,11 @@ import os
 import re
 import sys
 
-from ubnthelpers import get_ubnt_shortname
+from functools import lru_cache
+
+@lru_cache(None)
+def get_ubnt_shortname() -> str:
+    return os.popen("ubnteeprom -systeminfo -key shortname").read().rstrip("\n")
 
 DEVICE_DISK_INFO = {
     "UNVRPRO": {
