@@ -7,10 +7,10 @@ build_path="${root_path}/BuildEnv"
 docker_tag=unvr-nas:builder
 
 # Expected UNVR Firmware(s) and hash(s)
-UNVR_firmware_filename="62f6-UNVR-4.0.6-19610d35-cd43-4844-ae5e-5420d6ff6279.bin"
-UNVR_firmware_md5="dc2e1693fe44aae8437f8ebcd8f0c6c1"
-UNVRPRO_firmware_filename="19bf-UNVRPRO-4.0.6-6dd303cb-cb6d-4904-a8ee-ef6e5353016d.bin"
-UNVRPRO_firmware_md5="84476cd12b90ab8c5344d4ff66211b1b"
+UNVR_firmware_filename="df93-UNVR-4.0.18-45ee6a0c-32c9-4089-b4c0-3310196de7ae.bin"
+UNVR_firmware_md5="8df8a9ea16c6e171a77cbb3bc096f1de"
+UNVRPRO_firmware_filename="13b8-UNVRPRO-4.0.18-30952e81-b1e7-47fe-9bed-bd8d963d6048.bin"
+UNVRPRO_firmware_md5="4a6d1abb862a3d54a6f5a122497114e3"
 
 # Render our board out
 fwfnvar="${BOARD}_firmware_filename"
@@ -19,7 +19,7 @@ fwmd5var="${BOARD}_firmware_md5"
 firmware_md5="${!fwmd5var}"
 
 # Toolchain
-toolchain_url="https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+toolchain_url="https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
 toolchain_filename="$(basename ${toolchain_url})"
 toolchain_bin_path="${toolchain_filename%.tar.xz}/bin"
 toolchain_cross_compile="aarch64-none-linux-gnu-"
@@ -42,8 +42,7 @@ bluez_repopath="${bluez_filename%.tar.gz}"
 
 # Distro
 distrib_name="debian"
-#deb_mirror="http://ftp.us.debian.org/debian"
-deb_mirror="http://debian.uchicago.edu/debian"
+deb_mirror="http://ftp.us.debian.org/debian"
 deb_release="bookworm"
 deb_arch="arm64"
 fs_overlay_dir="filesystem"

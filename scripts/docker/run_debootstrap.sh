@@ -31,6 +31,8 @@ rm "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/ubnt_common.ko" 
 # Now, for the old kernel we built, pull in our extra modules we need! (depmod is done in bootstrap)
 cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/lib/zstd/zstd_compress.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
 cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/fs/btrfs/btrfs.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
+cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/fs/fuse/fuse.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
+cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/fs/fuse/cuse.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
 cp "${build_path}/kernel/ubnt-mtd-lock.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
 
 # Copy over our overlay if we have one
