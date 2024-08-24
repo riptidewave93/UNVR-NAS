@@ -41,3 +41,14 @@ fi
 if [ -f "/sys/class/leds/ulogo_ctrl/pattern" ]; then
 	echo 0:500 > /sys/class/leds/ulogo_ctrl/pattern
 fi
+
+# Do a sync before we do abusive things
+sync
+
+# Finally, the UNVR's are known to not properly shutdown, due to either a kernel or u-boot thing we can't control, so
+# we need to hijack shutdowns and turn them into halts to actually keep the system from restarting. This isn't a watchdog
+# thing as far as I can tell, so ugh. This is why it would be nice to have GPL kernel/u-boot sources but alas.
+if [[ "$1" == "poweroff" ]]; then
+	halt &
+	sleep 30 # Let the halt bring us to the darkness we deserve
+fi
