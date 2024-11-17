@@ -7,10 +7,10 @@ build_path="${root_path}/BuildEnv"
 docker_tag=unvr-nas:builder
 
 # Expected UNVR Firmware(s) and hash(s)
-UNVR_firmware_filename="df93-UNVR-4.0.18-45ee6a0c-32c9-4089-b4c0-3310196de7ae.bin"
-UNVR_firmware_md5="8df8a9ea16c6e171a77cbb3bc096f1de"
-UNVRPRO_firmware_filename="13b8-UNVRPRO-4.0.18-30952e81-b1e7-47fe-9bed-bd8d963d6048.bin"
-UNVRPRO_firmware_md5="4a6d1abb862a3d54a6f5a122497114e3"
+UNVR_firmware_filename="0592-UNVR-4.1.9-6ea55371-e18f-4de9-a67e-a5c63bb0fc2f.bin"
+UNVR_firmware_md5="7222b70f9383781133e40a134eb0fc06"
+UNVRPRO_firmware_filename="ca04-UNVRPRO-4.1.9-0e3e9c30-7e9a-48ba-975d-2ad0ff8f8eee.bin"
+UNVRPRO_firmware_md5="ae41e9f61246877958c394f57b3618ca"
 
 # Render our board out
 fwfnvar="${BOARD}_firmware_filename"

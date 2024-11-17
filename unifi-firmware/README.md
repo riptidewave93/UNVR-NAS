@@ -3,10 +3,10 @@
 Please place the UNVR/UNVR Pro firmware in this directory.
 
 * UNVR:
-  * Name: [df93-UNVR-4.0.18-45ee6a0c-32c9-4089-b4c0-3310196de7ae.bin](https://community.ui.com/releases/UniFi-OS-Network-Video-Recorders-4-0-18/68a757a3-2f25-45c4-912b-0c29c7e4bc06)
-  * MD5Sum: 8df8a9ea16c6e171a77cbb3bc096f1de
+  * Name: [0592-UNVR-4.1.9-6ea55371-e18f-4de9-a67e-a5c63bb0fc2f.bin](https://community.ui.com/releases/UniFi-OS-Network-Video-Recorders-4-1-9/951963ff-a06d-4895-8aac-4bcff43489c1)
+  * MD5Sum: 7222b70f9383781133e40a134eb0fc06
 
 
 * UNVR Pro:
-  * Name: [13b8-UNVRPRO-4.0.18-30952e81-b1e7-47fe-9bed-bd8d963d6048.bin](https://community.ui.com/releases/UniFi-OS-Network-Video-Recorders-4-0-18/68a757a3-2f25-45c4-912b-0c29c7e4bc06)
-  * MD5Sum: 4a6d1abb862a3d54a6f5a122497114e3
+  * Name: [ca04-UNVRPRO-4.1.9-0e3e9c30-7e9a-48ba-975d-2ad0ff8f8eee.bin](https://community.ui.com/releases/UniFi-OS-Network-Video-Recorders-4-1-9/951963ff-a06d-4895-8aac-4bcff43489c1)
+  * MD5Sum: ae41e9f61246877958c394f57b3618ca
