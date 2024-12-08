@@ -33,6 +33,8 @@ cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/
 cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/fs/btrfs/btrfs.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
 cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/fs/fuse/fuse.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
 cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/fs/fuse/cuse.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
+cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/fs/quota/quota_tree.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
+cp "${build_path}/kernel/kernel-modules/lib/modules/4.19.152-alpine-unvr/kernel/fs/quota/quota_v2.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
 cp "${build_path}/kernel/ubnt-mtd-lock.ko" "${build_path}/rootfs/lib/modules/4.19.152-alpine-unvr/extra/"
 
 # Copy over our overlay if we have one
